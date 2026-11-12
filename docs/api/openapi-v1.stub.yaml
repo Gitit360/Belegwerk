@@ -3,36 +3,63 @@ info:
   title: Belegwerk Local API
   version: 0.1.0
   description: |
-    Loopback-only stub. Auth token + host checks planned in M02/M13.
-    No bank payment endpoints that succeed.
+    Loopback-only local API stub (M13). Auth token + host checks planned.
+    Permission Gate applies to all mutating routes. Bank payments always 403.
 servers:
   - url: http://127.0.0.1:47821/v1
-    description: Default local bind (not started in scaffold)
+    description: Default local bind (server not started in this slice)
 paths:
   /health:
     get:
       summary: Liveness
+      operationId: getHealth
       responses:
         "200":
           description: OK
-  /tax-drafts/{kind}/{period}:
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  name: { type: string }
+                  version: { type: string }
+                  bankPaymentsEnabled: { type: boolean }
+  /status:
     get:
-      summary: Tax return draft shell
-      parameters:
-        - in: path
-          name: kind
-          required: true
-          schema: { type: string }
-        - in: path
-          name: period
-          required: true
-          schema: { type: string }
+      summary: Short German status
+      operationId: getStatus
       responses:
         "200":
-          description: Draft shell (no verified form mapping)
+          description: OK
+  /imports:
+    post:
+      summary: Import synthetic/local files (gated)
+      operationId: createImport
+      responses:
+        "200":
+          description: ImportBatch created
+        "403":
+          description: Permission denied
+  /match/suggestions:
+    post:
+      summary: Matching suggestions (amount/reference heuristics)
+      operationId: suggestMatches
+      responses:
+        "200":
+          description: Ranked MatchCandidate list
+  /journal/drafts:
+    post:
+      summary: Create journal draft (must balance; unverified tax blocked)
+      operationId: createJournalDraft
+      responses:
+        "200":
+          description: Draft
+        "422":
+          description: Unbalanced or blocked unsupported case
   /bank/payments:
     post:
       summary: Permanently disabled
+      operationId: createBankPayment
       responses:
         "403":
           description: bank.payment.create is not implemented (REQ-S-004)

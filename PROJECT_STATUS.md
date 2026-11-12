@@ -1,8 +1,14 @@
 # Belegwerk – Project Status
 
 Stand: 12. November 2026 (Europe/Berlin)  
-Repository: `Gitit360/Belegwerk`  
-Branch: `cursor/m00-m01-scaffold-0636` (overnight full-surface push)
+Repository: `Gitit360/Belegwerk`
+
+## Pull requests
+
+| PR | Branch | Focus |
+|---|---|---|
+| [#1](https://github.com/Gitit360/Belegwerk/pull/1) | `cursor/m00-m01-scaffold-0636` | M00 docs + scaffold foundation |
+| (upcoming) | `cursor/vertical-slices-m02-m13-0636` | Working vertical slices M02/M03/M05/M11/M13 |
 
 ---
 
@@ -10,22 +16,22 @@ Branch: `cursor/m00-m01-scaffold-0636` (overnight full-surface push)
 
 | Modul | Name | Status | Hinweis |
 |---|---|---|---|
-| M00 | Discovery / Spec | **done (docs in repo)** | Abnahme-Checkboxen in `docs/acceptance/M00_ACCEPTANCE.md` |
-| M01 | Repo / Designsystem / Skeleton | **landed** | Tokens, Nav-Shell, migrations, CI |
-| M02 | Plugin-Host / Rechte | **stub landed** | In-process host + Permission Gate; IPC pin open |
-| M03 | Archiv / Import | **stub landed** | FsBlobStore + DocumentMeta + ImportBatch |
-| M04 | MoneyMoney | **stub landed** | Synthetic fixtures; live AppleScript = macOS gap |
-| M05 | Matching / Splits / UI | **types + nav** | StatusDimensions; no full workbench UI yet |
-| M06 | Proxy / Reminder | **stub landed** | DocumentPlaceholder + MissingDocumentCase |
-| M07 | OCR / Search | **stub landed** | ExtractionResult without inventing fields |
-| M08 | KI-Adapter | **interface landed** | NullAiProvider offline; Ollama port unwired |
-| M09 | GrandTotal | **stub landed** | File adapter stub; no proprietary DB |
-| M10 | Mail / Portale | **stub only** | Capabilities in plugin spec; no live mail |
-| M11 | Buchhaltungskern | **structures landed** | SKR03 seed accounts; posting blocked without reviewed rules |
-| M12 | Steuerentwürfe / Berichte | **shells landed** | TaxReturnDraft shells; no form field invention |
-| M13 | Export / API / MCP | **stubs landed** | OpenAPI stub + export package stub + MCP note |
-| M14 | Härtung | **partial** | Backup doc + migration tests; restore drill pending macOS |
-| M15 | Extensions | **hooks only** | Bank X / Steuerboard / ERiC / EU-B2B blocked or deferred |
+| M00 | Discovery / Spec | **done (docs in repo)** | Abnahme-Checkboxen offen |
+| M01 | Repo / Designsystem / Skeleton | **landed (#1)** | Tokens, Nav-Shell, CI |
+| M02 | Plugin-Host / Rechte | **deepened** | CommandBus + Gate on all commands; bank-pay denied + audited |
+| M03 | Archiv / Import | **deepened** | ImportPipeline: hash → blob → ImportBatch/Document rows |
+| M04 | MoneyMoney | stub | Synthetic fixtures; AppleScript = macOS gap |
+| M05 | Matching / Splits / UI | **deepened** | Amount/reference engine + three-pane fixture workbench |
+| M06 | Proxy / Reminder | stub | Types only |
+| M07 | OCR / Search | stub | Extraction without inventing fields |
+| M08 | KI-Adapter | interface | NullAiProvider offline |
+| M09 | GrandTotal | stub | File adapter stub |
+| M10 | Mail / Portale | stub | Slots only |
+| M11 | Buchhaltungskern | **deepened** | Balanced journal drafts; unverified tax blocked |
+| M12 | Steuerentwürfe / Berichte | shells | No form field invention |
+| M13 | Export / API / MCP | **deepened** | OpenAPI routes + CLI `health`/`status` |
+| M14 | Härtung | partial | Backup helper |
+| M15 | Extensions | hooks | Bank X / Steuerboard / ERiC |
 
 ---
 

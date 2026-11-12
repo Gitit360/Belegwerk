@@ -7,6 +7,7 @@ description = "Application services: permission gate, approvals, orchestration s
 
 [dependencies]
 belegwerk-domain = { path = "../domain" }
+belegwerk-infrastructure = { path = "../infrastructure" }
 serde = { workspace = true }
 serde_json = { workspace = true }
 thiserror = { workspace = true }
@@ -14,6 +15,8 @@ uuid = { workspace = true }
 chrono = { workspace = true }
 sha2 = { workspace = true }
 hex = { workspace = true }
+rusqlite = { workspace = true }
 
 [dev-dependencies]
 belegwerk-plugin-host = { path = "../plugin-host" }
+tempfile = { workspace = true }

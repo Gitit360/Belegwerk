@@ -20,3 +20,4 @@ pub use finance::{EconomicTransaction, SourceTransaction, TransactionStatus};
 pub use ids::{DocumentId, EconomicTransactionId, ImportBatchId, SourceTransactionId};
 pub use matching::{MatchCandidate, MatchConfidence, StatusDimensions};
 pub use money::{CurrencyCode, MoneyAmount};
+pub use time::CalendarDate;
