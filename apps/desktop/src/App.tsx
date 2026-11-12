@@ -1,6 +1,16 @@
 import { useEffect, useState } from "react";
+import {
+  AccountingPage,
+  AccountsPage,
+  ArchivePage,
+  AutomationsPage,
+  MissingPage,
+  PlaceholderModulePage,
+  ReportsPage,
+} from "./FixturePages";
 import { MatchingWorkbench } from "./MatchingWorkbench";
 import { NAV_ITEMS, PLACEHOLDER_COPY, type NavId } from "./nav";
+import { ErrorState, LoadingState, fixtureStateCss } from "./uiStates";
 
 type HealthInfo = {
   app: string;
@@ -27,16 +37,30 @@ async function loadHealth(): Promise<HealthInfo> {
   }
 }
 
+type HealthLoad = "loading" | "ready" | "error";
+
 export function App() {
   const [active, setActive] = useState<NavId>("overview");
   const [health, setHealth] = useState<HealthInfo>(FALLBACK_HEALTH);
+  const [healthLoad, setHealthLoad] = useState<HealthLoad>("loading");
   const copy = PLACEHOLDER_COPY[active];
 
   useEffect(() => {
     let cancelled = false;
-    void loadHealth().then((h) => {
-      if (!cancelled) setHealth(h);
-    });
+    setHealthLoad("loading");
+    void loadHealth()
+      .then((h) => {
+        if (!cancelled) {
+          setHealth(h);
+          setHealthLoad("ready");
+        }
+      })
+      .catch(() => {
+        if (!cancelled) {
+          setHealth(FALLBACK_HEALTH);
+          setHealthLoad("error");
+        }
+      });
     return () => {
       cancelled = true;
     };
@@ -76,14 +100,24 @@ export function App() {
         </header>
         <section className="bw-panel" aria-label="Modulstatus">
           <ModulePanel id={active} />
-          <p className="bw-meta">
-            {health.app} {health.version} · {health.locale} · Bankzahlungen:{" "}
-            {health.bank_payments ? "an" : "aus"} · Telemetrie-Default:{" "}
-            {health.telemetry_default ? "an" : "aus"}
-          </p>
+          {healthLoad === "loading" ? (
+            <LoadingState label="App-Status wird geladen …" />
+          ) : healthLoad === "error" ? (
+            <ErrorState
+              title="Status nicht erreichbar"
+              body="Tauri-Health fehlgeschlagen — Vite-Fallback aktiv (kein Live-Backend)."
+            />
+          ) : (
+            <p className="bw-meta">
+              {health.app} {health.version} · {health.locale} · Bankzahlungen:{" "}
+              {health.bank_payments ? "an" : "aus"} · Telemetrie-Default:{" "}
+              {health.telemetry_default ? "an" : "aus"}
+            </p>
+          )}
         </section>
       </main>
       <style>{shellCss}</style>
+      <style>{fixtureStateCss}</style>
     </div>
   );
 }
@@ -99,35 +133,21 @@ function ModulePanel({ id }: { id: NavId }) {
         </p>
       );
     case "accounts":
-      return (
-        <p>
-          MoneyMoney-Adapter ist Read-only. Capability <code>bank.transactions.read</code> erlaubt;
-          <code> bank.payment.create</code> existiert nicht und wird vom Gate verweigert.
-        </p>
-      );
+      return <AccountsPage />;
     case "matching":
       return <MatchingWorkbench />;
+    case "missing":
+      return <MissingPage />;
+    case "archive":
+      return <ArchivePage />;
     case "accounting":
-      return (
-        <p>
-          SKR03-Kontenrahmen-Platzhalter ohne Steuersätze. Buchungsentwürfe ohne freigegebenes
-          Regelpaket sind nicht festschreibbar (<code>BlockedUnsupported</code>).
-        </p>
-      );
+      return <AccountingPage />;
+    case "reports":
+      return <ReportsPage />;
     case "automations":
-      return (
-        <p>
-          Plugin-Host stub (<code>sdkVersion: &quot;1&quot;</code>). Connectoren MoneyMoney / GrandTotal /
-          hello-document-source sind Development-Stubs ohne Live-Credentials.
-        </p>
-      );
+      return <AutomationsPage />;
     default:
-      return (
-        <p>
-          Platzhalter für Modulfläche <strong>{PLACEHOLDER_COPY[id].title}</strong>. Siehe{" "}
-          <code>PROJECT_STATUS.md</code> und <code>docs/acceptance/MODULE_SURFACE.md</code>.
-        </p>
-      );
+      return <PlaceholderModulePage title={PLACEHOLDER_COPY[id].title} />;
   }
 }
 
@@ -212,6 +232,27 @@ const shellCss = `
   margin-top: var(--bw-space-4);
   color: var(--bw-color-text-secondary);
   font-size: 0.9rem;
+}
+.bw-fixture-note, .bw-list-meta {
+  color: var(--bw-color-text-secondary);
+  font-size: 0.9rem;
+}
+.bw-simple-list {
+  list-style: none;
+  margin: var(--bw-space-3) 0 0;
+  padding: 0;
+  display: grid;
+  gap: var(--bw-space-2);
+}
+.bw-simple-list li {
+  padding: var(--bw-space-3);
+  border: 1px solid var(--bw-color-border-subtle);
+  border-radius: var(--bw-radius-sm);
+  background: var(--bw-color-surface-muted);
+}
+.bw-subhead {
+  margin: var(--bw-space-4) 0 var(--bw-space-2);
+  font-size: 0.95rem;
 }
 code {
   font-family: var(--bw-font-mono);

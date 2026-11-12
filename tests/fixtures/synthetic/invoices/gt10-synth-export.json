@@ -1,0 +1,13 @@
+{
+  "note": "synthetic GrandTotal 10 export fixture — not real invoices",
+  "invoices": [
+    {
+      "invoiceNumber": "GT-SYNTH-2001",
+      "issueDate": "2026-01-10",
+      "amountMinor": 119000,
+      "currency": "EUR",
+      "customer": "Synthetic Client AG",
+      "source": "synthetic-fixture"
+    }
+  ]
+}

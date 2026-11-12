@@ -3,47 +3,56 @@
 Stand: 12. November 2026 (Europe/Berlin)  
 Repository: `Gitit360/Belegwerk`
 
-## Pull requests
+## Pull requests (nicht mergen ohne Nutzer)
 
-| PR | Branch | Focus | CI |
+| PR | Branch | Focus | CI (letzter Stand) |
 |---|---|---|---|
-| [#1](https://github.com/Gitit360/Belegwerk/pull/1) | `cursor/m00-m01-scaffold-0636` | M00 docs + scaffold foundation | **green** on `0ff457d` |
-| [#2](https://github.com/Gitit360/Belegwerk/pull/2) | `cursor/vertical-slices-m02-m13-0636` | Working vertical slices (stacked on #1) | in progress / iterate |
+| [#1](https://github.com/Gitit360/Belegwerk/pull/1) | `cursor/m00-m01-scaffold-0636` | M00 docs + Scaffold | green |
+| [#2](https://github.com/Gitit360/Belegwerk/pull/2) | `cursor/vertical-slices-m02-m13-0636` | Gate/import/match/journal/CLI | green |
+| [#4](https://github.com/Gitit360/Belegwerk/pull/4) | `cursor/modules-m04-m15-depth-0636` | M04–M15 Depth + Fixture-UI + Hardening | green @ `3de087a`; overnight follow-up pushed |
+
+Merge-Reihenfolge wenn freigegeben: **#1 → #2 → #4** (Stack).
 
 ---
 
 ## Modulstatus
 
-| Modul | Name | Status | Hinweis |
-|---|---|---|---|
-| M00 | Discovery / Spec | **done** | Abnahme-Checkboxen offen |
-| M01 | Repo / Designsystem / Skeleton | **landed (#1)** | Tokens, Nav-Shell, CI |
-| M02 | Plugin-Host / Rechte | **deepened** | CommandBus + Gate + audit |
-| M03 | Archiv / Import | **deepened** | ImportPipeline end-to-end |
-| M04 | MoneyMoney | **deepened (Linux)** | BankImportService + synthetic upsert; AppleScript macOS gap |
-| M05 | Matching / Splits / UI | **deepened** | Engine + three-pane workbench |
-| M06 | Proxy / Reminder | **deepened** | ReminderService cases/placeholders/escalation |
-| M07 | OCR / Search | stub | Extraction without inventing fields |
-| M08 | KI-Adapter | interface | NullAiProvider offline |
-| M09 | GrandTotal | stub | File adapter stub |
-| M10 | Mail / Portale | stub | Slots only |
-| M11 | Buchhaltungskern | **deepened** | Balanced journal; blocked unverified tax |
-| M12 | Steuerentwürfe / Berichte | shells | No form field invention |
-| M13 | Export / API / MCP | **deepened** | OpenAPI + CLI + loopback HTTP stub `/v1/health` + 403 payments |
-| M14 | Härtung | partial | Backup helper |
-| M15 | Extensions | hooks | Bank X / Steuerboard / ERiC |
+| Modul | Status | Hinweis |
+|---|---|---|
+| M00 | done | Abnahme-Checkboxen offen |
+| M01 | landed | Tokens + Nav-Shell; DE empty/loading/error |
+| M02 | hardened | CommandBus + Gate; Bank-Pay Deny + Audit Tests |
+| M03 | hardened | ImportPipeline; Blob-Idempotenz + zwei Meta-Rows |
+| M04 | deepened | Fixture replay MoneyMoney (no AppleScript) |
+| M05 | hardened | Matching: Currency-/Tolerance-Edges |
+| M06 | deepened | ReminderService + JobQueue |
+| M07 | deepened | Labeled extraction + search index rebuild |
+| M08 | deepened | AiRouter offline fallback (`force_offline` on CI) |
+| M09 | deepened | GrandTotal JSON fixture import; DB writes forbidden |
+| M10 | deepened | Mail search/draft + portal probe stubs |
+| M11 | hardened | Journal balance + draft-pack gate |
+| M12 | deepened | Report shells + drill-down stubs |
+| M13 | deepened | OpenAPI + CLI + HTTP stub |
+| M14 | hardened | Backup/restore: schema + blob bytes integrity |
+| M15 | deepened | Extension hook registry (all disabled) |
 
----
+## Overnight follow-up (diese Runde)
+
+- Zusätzliche Unit-Tests: Permission Gate, Import-Idempotenz, Matching-Edges, Journal, Restore-Integrität
+- Deutsche UI-Zustände (laden / leer / Fehler) auf Fixture-Seiten + Matching; Design-Tokens durchgängig
+- `OPEN_QUESTIONS.md` auf echte macOS/externe Blocker reduziert
+- Morning Briefing: `/cursor/stores/self/internal/morning-briefing.md`
 
 ## Policy
 
-- Keine Bankzahlungen · keine Credentials · nur synthetische Fixtures  
-- Keine erfundenen Steuerregeln · keine Fake-GoBD-Claims  
-- UI Deutsch / Code Englisch  
+Keine Bankzahlungen · synthetische Fixtures only · keine erfundenen Steuerregeln · keine GoBD-Claims · **kein Merge ohne Nutzer**
+
+## Fake vs. real (Kurz)
+
+| Real / getestet in CI/Linux | Fake / Stub / macOS-only |
+|---|---|
+| Domain, Gate, Import, Match, Journal, SQLite, Blob, Backup/Restore, CLI doctor, Vite UI | Tauri native window, MoneyMoney AppleScript, Keychain, Apple Mail, GrandTotal live, ERiC, Steuerboard, Bank X |
 
 ## macOS-only gaps
 
-- Tauri window / notarization  
-- MoneyMoney AppleScript  
-- Keychain credential broker  
-- Apple Mail connector probe  
+Tauri GUI · MoneyMoney AppleScript · Keychain · Apple Mail — Details in `OPEN_QUESTIONS.md`
