@@ -1,13 +1,16 @@
 import { useEffect, useState } from "react";
 import {
+  AccountingPage,
   AccountsPage,
   ArchivePage,
   AutomationsPage,
   MissingPage,
+  PlaceholderModulePage,
   ReportsPage,
 } from "./FixturePages";
 import { MatchingWorkbench } from "./MatchingWorkbench";
 import { NAV_ITEMS, PLACEHOLDER_COPY, type NavId } from "./nav";
+import { ErrorState, LoadingState, fixtureStateCss } from "./uiStates";
 
 type HealthInfo = {
   app: string;
@@ -34,16 +37,30 @@ async function loadHealth(): Promise<HealthInfo> {
   }
 }
 
+type HealthLoad = "loading" | "ready" | "error";
+
 export function App() {
   const [active, setActive] = useState<NavId>("overview");
   const [health, setHealth] = useState<HealthInfo>(FALLBACK_HEALTH);
+  const [healthLoad, setHealthLoad] = useState<HealthLoad>("loading");
   const copy = PLACEHOLDER_COPY[active];
 
   useEffect(() => {
     let cancelled = false;
-    void loadHealth().then((h) => {
-      if (!cancelled) setHealth(h);
-    });
+    setHealthLoad("loading");
+    void loadHealth()
+      .then((h) => {
+        if (!cancelled) {
+          setHealth(h);
+          setHealthLoad("ready");
+        }
+      })
+      .catch(() => {
+        if (!cancelled) {
+          setHealth(FALLBACK_HEALTH);
+          setHealthLoad("error");
+        }
+      });
     return () => {
       cancelled = true;
     };
@@ -83,14 +100,24 @@ export function App() {
         </header>
         <section className="bw-panel" aria-label="Modulstatus">
           <ModulePanel id={active} />
-          <p className="bw-meta">
-            {health.app} {health.version} · {health.locale} · Bankzahlungen:{" "}
-            {health.bank_payments ? "an" : "aus"} · Telemetrie-Default:{" "}
-            {health.telemetry_default ? "an" : "aus"}
-          </p>
+          {healthLoad === "loading" ? (
+            <LoadingState label="App-Status wird geladen …" />
+          ) : healthLoad === "error" ? (
+            <ErrorState
+              title="Status nicht erreichbar"
+              body="Tauri-Health fehlgeschlagen — Vite-Fallback aktiv (kein Live-Backend)."
+            />
+          ) : (
+            <p className="bw-meta">
+              {health.app} {health.version} · {health.locale} · Bankzahlungen:{" "}
+              {health.bank_payments ? "an" : "aus"} · Telemetrie-Default:{" "}
+              {health.telemetry_default ? "an" : "aus"}
+            </p>
+          )}
         </section>
       </main>
       <style>{shellCss}</style>
+      <style>{fixtureStateCss}</style>
     </div>
   );
 }
@@ -114,24 +141,13 @@ function ModulePanel({ id }: { id: NavId }) {
     case "archive":
       return <ArchivePage />;
     case "accounting":
-      return (
-        <p>
-          SKR03-Kontenrahmen-Platzhalter ohne Steuersätze. Buchungsentwürfe ohne freigegebenes
-          Regelpaket sind nicht festschreibbar (<code>BlockedUnsupported</code>). Bankzahlungen
-          bleiben dauerhaft gesperrt.
-        </p>
-      );
+      return <AccountingPage />;
     case "reports":
       return <ReportsPage />;
     case "automations":
       return <AutomationsPage />;
     default:
-      return (
-        <p>
-          Platzhalter für Modulfläche <strong>{PLACEHOLDER_COPY[id].title}</strong>. Siehe{" "}
-          <code>PROJECT_STATUS.md</code> und <code>docs/acceptance/MODULE_SURFACE.md</code>.
-        </p>
-      );
+      return <PlaceholderModulePage title={PLACEHOLDER_COPY[id].title} />;
   }
 }
 

@@ -1,27 +1,23 @@
 # Belegwerk – Open Questions
 
 Stand: 12. November 2026 (Europe/Berlin)  
-Regel: Nur **bewusst deferred** Items (Gap-Analyse §3). Entschiedene Defaults stehen im Decision Register / `docs/architecture/DECISIONS.md`.
+Regel: Nur **echte macOS- oder externe Blocker**. Entschiedene Engineering-Defaults stehen in `docs/architecture/DECISIONS.md` und gehören nicht hierher.
 
 ---
 
-| Thema | Grund | Wiederaufnahme |
+| Thema | Warum blockiert (extern / macOS) | Wiederaufnahme |
 |---|---|---|
-| Finale Open-Source-/Kommerzlizenz (D-09) | Nutzerentscheid; SDK-Doku bleibt versioniert | Vor öffentlicher SDK-Freigabe |
-| Marken-/Namensrechte „Belegwerk“ (G-25) | Rechtliche Prüfung, kein Engineering-Blocker | Vor öffentlichem Marketing/Distribution |
-| Konkrete Backup-Medien/Orte (G-24) | Hängt von Hardware und Ops-Präferenz ab | Vor Produktivbetrieb / M14 |
-| GrandTotal exakte Exportfelder (G-27) | Erfordert laufende GT-10-Installation und Probe | M09 |
-| Bank X konkrete Schnittstelle (G-28 / D-03) | Phase-2; MoneyMoney zuerst | M15 |
-| EU-B2B-Fallregeln (D-06) | Außerhalb v1-Matrix; Steuerrecht verifizieren | Nach v1-Stabilität / M15 |
-| Visuelle Node-Graph-UI (D-17) | UX-Entscheidung Nutzer; Listen reichen | Nach Nutzerbestätigung |
-| ERiC-Direktübermittlung (G-26) | Externe Registrierung + Plattformcheck | M15 |
-| Steuerboard-Anbindung (D-13) | Nicht kritisch für Kernzuverlässigkeit | Post-M15 |
-| Produktiv-Steuerwerte (Sätze, GWG-Grenzen je Jahr) | Keine erfundenen Rechtsgewissheiten | Vor M11 mit Quellenprüfung |
-| SQLCipher vs. Alternative (D-20) | Engineering-Default gesetzt; Library-Pin | M01 ADR |
-| Plugin-Host IPC Transport (stdio vs. UDS) | Spike nötig | M02 |
-| Plugin-Signatur-PKI | Vor Prod-Plugin-Distribution | M14 |
-| CLI als separates Binary vs. Subcommand | Layout-Detail | M01 |
+| Tauri-Desktop-GUI auf echtem macOS | CI ist Linux; `tauri dev`/`tauri build` nicht in dieser Cloud-Umgebung verifizierbar | Vor erstem lokalen Smoke auf Mac |
+| MoneyMoney Live-AppleScript (M04) | Erfordert macOS + installiertes MoneyMoney; Linux nur Fixture-Replay | M04 Live-Probe auf Nutzer-Mac |
+| Keychain / Credential-Slot | macOS Keychain APIs; keine Secrets in Repo/CI | Vor Live-Connector-Auth |
+| Apple Mail Search/Draft (M10) | macOS Mail + Automation-Rechte; Stub reicht für Linux CI | M10 Live-Probe |
+| GrandTotal 10 Exportfelder (G-27) | Braucht laufende GT-10-Installation und Probe-Export | M09 Live-Probe |
+| ERiC-Direktübermittlung (G-26) | Externe Registrierung + Plattformcheck, kein In-Repo-Mock | M15 |
+| Finale OSS-/Kommerzlizenz (D-09) | Nutzer-/Rechtsentscheid, kein Code-Default | Vor öffentlicher SDK-Freigabe |
+| Marken-/Namensrechte „Belegwerk“ (G-25) | Rechtliche Prüfung | Vor öffentlichem Marketing |
+| Produktiv-Steuerwerte (Sätze, GWG je Jahr) | Quellenpflicht; keine erfundenen Rechtsgewissheiten | Vor produktivem M11 |
+| Bank X konkrete Schnittstelle (G-28) | Phase-2 Extern; MoneyMoney zuerst | M15 |
 
 ---
 
-*Keine Steuerregeln oder Konformitätsaussagen in dieser Liste — nur offene Engineering-/Produktentscheidungen.*
+*Keine Engineering-Nits (SQLCipher-Pin, CLI-Layout, Plugin-IPC-Spike, Node-Graph-UX) — die sind entschieden oder bewusst deferred in den ADRs.*

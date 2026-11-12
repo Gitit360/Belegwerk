@@ -68,5 +68,13 @@ mod tests {
         assert_eq!(v2, version);
         let store2 = FsBlobStore::new(restored).unwrap();
         assert!(store2.exists(&key.hash));
+        // integrity: schema_migrations preserved
+        let conn3 = open_db(&DataPaths::new(dir.path().join("data")).db_path()).unwrap();
+        let n: i64 = conn3
+            .query_row("SELECT COUNT(*) FROM schema_migrations", [], |r| r.get(0))
+            .unwrap();
+        assert!(n >= 1);
+        let bytes = std::fs::read(store2.path_for(&key.hash)).unwrap();
+        assert_eq!(bytes, b"synthetic-beleg-bytes");
     }
 }

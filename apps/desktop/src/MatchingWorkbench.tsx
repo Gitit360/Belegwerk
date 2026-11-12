@@ -1,15 +1,22 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   MATCHING_WORKBENCH,
   formatMoney,
   type FixtureDocument,
   type FixtureTransaction,
 } from "./fixtures/matchingWorkbench";
+import { EmptyState, LoadingState, fixtureStateCss } from "./uiStates";
 
 export function MatchingWorkbench() {
+  const [booting, setBooting] = useState(true);
   const [selectedTxId, setSelectedTxId] = useState(
     MATCHING_WORKBENCH.transactions[0]?.id ?? "",
   );
+
+  useEffect(() => {
+    const t = window.setTimeout(() => setBooting(false), 180);
+    return () => window.clearTimeout(t);
+  }, []);
 
   const selectedTx: FixtureTransaction | undefined = useMemo(
     () => MATCHING_WORKBENCH.transactions.find((t) => t.id === selectedTxId),
@@ -22,6 +29,27 @@ export function MatchingWorkbench() {
   const linkedDoc: FixtureDocument | undefined = suggestion
     ? MATCHING_WORKBENCH.documents.find((d) => d.id === suggestion.documentId)
     : undefined;
+
+  if (booting) {
+    return (
+      <div className="bw-workbench" aria-label="Abgleich-Arbeitsansicht">
+        <LoadingState label="Abgleich-Fixtures werden geladen …" />
+        <style>{fixtureStateCss}</style>
+      </div>
+    );
+  }
+
+  if (MATCHING_WORKBENCH.transactions.length === 0) {
+    return (
+      <div className="bw-workbench" aria-label="Abgleich-Arbeitsansicht">
+        <EmptyState
+          title="Keine Transaktionen"
+          body="Matching-Workbench ohne Fixture-Daten — keine Live-Bankanbindung."
+        />
+        <style>{fixtureStateCss}</style>
+      </div>
+    );
+  }
 
   return (
     <div className="bw-workbench" aria-label="Abgleich-Arbeitsansicht">
@@ -60,7 +88,10 @@ export function MatchingWorkbench() {
               <pre className="bw-excerpt">{linkedDoc.excerpt}</pre>
             </article>
           ) : (
-            <p className="bw-empty">Kein Vorschlagsbeleg für diese Transaktion.</p>
+            <EmptyState
+              title="Kein Vorschlagsbeleg"
+              body="Für diese Transaktion liegt kein automatischer Treffer vor."
+            />
           )}
         </section>
 
@@ -89,11 +120,12 @@ export function MatchingWorkbench() {
               </p>
             </div>
           ) : (
-            <p className="bw-empty">Keine Transaktion gewählt.</p>
+            <EmptyState title="Keine Transaktion gewählt" body="Bitte links eine Zeile auswählen." />
           )}
         </section>
       </div>
       <style>{workbenchCss}</style>
+      <style>{fixtureStateCss}</style>
     </div>
   );
 }
