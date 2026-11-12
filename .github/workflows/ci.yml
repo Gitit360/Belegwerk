@@ -26,16 +26,17 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4
-        with:
-          version: 10
+        # version comes from package.json "packageManager" field
       - uses: actions/setup-node@v4
         with:
           node-version: 22
           cache: pnpm
-      - run: pnpm install
+      - run: pnpm install --frozen-lockfile
       - run: pnpm typecheck
       - name: Vite production build (UI only)
         run: pnpm --filter @belegwerk/desktop build
+      - name: CLI stub
+        run: pnpm --filter @belegwerk/cli build && node packages/cli/dist/index.js health
 
   # Full Tauri packaging is macOS-primary; optional job may be added later on macos-latest.
   tauri-note:
