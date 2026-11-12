@@ -1,0 +1,18 @@
+{
+  "id": "belegwerk.connector.grandtotal",
+  "version": "0.0.1",
+  "sdkVersion": "1",
+  "kind": "invoice-import",
+  "displayName": "GrandTotal 10",
+  "description": "File-based invoice import stub (D-02). No proprietary DB writes.",
+  "capabilities": ["documents.list", "documents.download"],
+  "permissions": {
+    "networkDomains": [],
+    "filesystem": [],
+    "credentialScopes": [],
+    "maxRuntimeMs": 120000,
+    "maxMemoryMb": 512
+  },
+  "entrypoint": "stub",
+  "development": true
+}

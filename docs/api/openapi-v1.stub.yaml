@@ -1,0 +1,38 @@
+openapi: 3.1.0
+info:
+  title: Belegwerk Local API
+  version: 0.1.0
+  description: |
+    Loopback-only stub. Auth token + host checks planned in M02/M13.
+    No bank payment endpoints that succeed.
+servers:
+  - url: http://127.0.0.1:47821/v1
+    description: Default local bind (not started in scaffold)
+paths:
+  /health:
+    get:
+      summary: Liveness
+      responses:
+        "200":
+          description: OK
+  /tax-drafts/{kind}/{period}:
+    get:
+      summary: Tax return draft shell
+      parameters:
+        - in: path
+          name: kind
+          required: true
+          schema: { type: string }
+        - in: path
+          name: period
+          required: true
+          schema: { type: string }
+      responses:
+        "200":
+          description: Draft shell (no verified form mapping)
+  /bank/payments:
+    post:
+      summary: Permanently disabled
+      responses:
+        "403":
+          description: bank.payment.create is not implemented (REQ-S-004)

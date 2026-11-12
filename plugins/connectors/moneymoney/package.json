@@ -1,0 +1,16 @@
+{
+  "name": "@belegwerk/connector-moneymoney",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "dependencies": {
+    "@belegwerk/plugin-sdk": "workspace:*",
+    "@belegwerk/contracts": "workspace:*"
+  },
+  "devDependencies": {
+    "typescript": "^5.8.2"
+  }
+}
