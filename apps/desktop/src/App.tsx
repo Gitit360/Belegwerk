@@ -1,9 +1,45 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { NAV_ITEMS, PLACEHOLDER_COPY, type NavId } from "./nav";
+
+type HealthInfo = {
+  app: string;
+  version: string;
+  locale: string;
+  bank_payments: boolean;
+  telemetry_default: boolean;
+};
+
+const FALLBACK_HEALTH: HealthInfo = {
+  app: "Belegwerk",
+  version: "0.1.0",
+  locale: "de-DE",
+  bank_payments: false,
+  telemetry_default: false,
+};
+
+async function loadHealth(): Promise<HealthInfo> {
+  try {
+    const { invoke } = await import("@tauri-apps/api/core");
+    return await invoke<HealthInfo>("health");
+  } catch {
+    return FALLBACK_HEALTH;
+  }
+}
 
 export function App() {
   const [active, setActive] = useState<NavId>("overview");
+  const [health, setHealth] = useState<HealthInfo>(FALLBACK_HEALTH);
   const copy = PLACEHOLDER_COPY[active];
+
+  useEffect(() => {
+    let cancelled = false;
+    void loadHealth().then((h) => {
+      if (!cancelled) setHealth(h);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   return (
     <div className="bw-shell">
@@ -34,20 +70,66 @@ export function App() {
           <h2>{copy.title}</h2>
           <p className="bw-lede">{copy.body}</p>
         </header>
-        <section className="bw-panel" aria-label="Platzhalter">
-          <p>
-            Scaffold-Status: Domäne, Permission Gate, SQLite-Migrationen und Plugin-SDK sind
-            vorbereitet. Fachliche Steuerregeln werden nicht erfunden — unsupported cases bleiben
-            blockiert.
-          </p>
+        <section className="bw-panel" aria-label="Modulstatus">
+          <ModulePanel id={active} />
           <p className="bw-meta">
-            Theme: Tokens hell/dunkel bereit · Keine Telemetrie · Synthetische Fixtures only
+            {health.app} {health.version} · {health.locale} · Bankzahlungen:{" "}
+            {health.bank_payments ? "an" : "aus"} · Telemetrie-Default:{" "}
+            {health.telemetry_default ? "an" : "aus"}
           </p>
         </section>
       </main>
       <style>{shellCss}</style>
     </div>
   );
+}
+
+function ModulePanel({ id }: { id: NavId }) {
+  switch (id) {
+    case "overview":
+      return (
+        <p>
+          Scaffold-Status: Domäne, Permission Gate, SQLite-Migrationen und Plugin-SDK sind
+          vorbereitet. Fachliche Steuerregeln werden nicht erfunden — unsupported cases bleiben
+          blockiert.
+        </p>
+      );
+    case "accounts":
+      return (
+        <p>
+          MoneyMoney-Adapter ist Read-only. Capability <code>bank.transactions.read</code> erlaubt;
+          <code> bank.payment.create</code> existiert nicht und wird vom Gate verweigert.
+        </p>
+      );
+    case "matching":
+      return (
+        <p>
+          Statusdimensionen: Dokumentvollständigkeit, Match, Extraktion, Buchung, Export. Viele-zu-viele
+          Matching-Typen liegen im Domain-Crate; Arbeitsoberfläche folgt.
+        </p>
+      );
+    case "accounting":
+      return (
+        <p>
+          SKR03-Kontenrahmen-Platzhalter ohne Steuersätze. Buchungsentwürfe ohne freigegebenes
+          Regelpaket sind nicht festschreibbar (<code>BlockedUnsupported</code>).
+        </p>
+      );
+    case "automations":
+      return (
+        <p>
+          Plugin-Host stub (<code>sdkVersion: &quot;1&quot;</code>). Connectoren MoneyMoney / GrandTotal /
+          hello-document-source sind Development-Stubs ohne Live-Credentials.
+        </p>
+      );
+    default:
+      return (
+        <p>
+          Platzhalter für Modulfläche <strong>{PLACEHOLDER_COPY[id].title}</strong>. Siehe{" "}
+          <code>PROJECT_STATUS.md</code> und <code>docs/acceptance/MODULE_SURFACE.md</code>.
+        </p>
+      );
+  }
 }
 
 const shellCss = `
@@ -128,6 +210,10 @@ const shellCss = `
   margin-top: var(--bw-space-4);
   color: var(--bw-color-text-secondary);
   font-size: 0.9rem;
+}
+code {
+  font-family: var(--bw-font-mono);
+  font-size: 0.9em;
 }
 @media (max-width: 800px) {
   .bw-shell {
