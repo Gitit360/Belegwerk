@@ -1,0 +1,12 @@
+{
+  "providerId": "moneymoney",
+  "sourceAccountId": "synth-gls-main",
+  "sourceTransactionRef": "mm-synth-001",
+  "bookingDate": "2026-01-15",
+  "valueDate": "2026-01-15",
+  "amountMinor": -2499,
+  "currency": "EUR",
+  "counterparty": "Synthetic Cloud Tools LLC",
+  "purpose": "INV-SYNTH-1001 SaaS",
+  "note": "synthetic only — not a real bank export"
+}

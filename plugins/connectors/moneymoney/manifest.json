@@ -1,0 +1,18 @@
+{
+  "id": "belegwerk.connector.moneymoney",
+  "version": "0.0.1",
+  "sdkVersion": "1",
+  "kind": "bank-import",
+  "displayName": "MoneyMoney",
+  "description": "Read-only bank import stub. Live AppleScript only on macOS (M04).",
+  "capabilities": ["bank.transactions.read"],
+  "permissions": {
+    "networkDomains": [],
+    "filesystem": [],
+    "credentialScopes": [],
+    "maxRuntimeMs": 120000,
+    "maxMemoryMb": 512
+  },
+  "entrypoint": "stub",
+  "development": true
+}

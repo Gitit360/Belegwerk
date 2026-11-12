@@ -1,0 +1,5 @@
+SYNTHETIC INVOICE — NOT A REAL BELEG
+Invoice: INV-SYNTH-1001
+Vendor: Synthetic Cloud Tools LLC
+Amount: EUR 24.99
+Date: 2026-01-12

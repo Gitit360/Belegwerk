@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://belegwerk.local/schemas/manifest.schema.json",
+  "title": "BelegwerkPluginManifest",
+  "type": "object",
+  "required": ["id", "version", "sdkVersion", "kind", "displayName", "capabilities", "permissions", "entrypoint"],
+  "properties": {
+    "id": { "type": "string" },
+    "version": { "type": "string" },
+    "sdkVersion": { "type": "string" },
+    "kind": { "type": "string" },
+    "displayName": { "type": "string" },
+    "description": { "type": "string" },
+    "capabilities": { "type": "array", "items": { "type": "string" } },
+    "permissions": { "type": "object" },
+    "entrypoint": { "type": "string" },
+    "development": { "type": "boolean" }
+  }
+}

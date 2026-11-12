@@ -1,0 +1,48 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  font-family: var(--bw-font-sans);
+  color: var(--bw-color-text-primary);
+  background: var(--bw-bg-atmosphere);
+}
+
+button {
+  font: inherit;
+}
+
+:focus-visible {
+  outline: var(--bw-focus-ring-width) solid var(--bw-color-focus-ring);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .bw-fade-in {
+    animation: bw-fade var(--bw-motion-duration-medium) var(--bw-motion-ease) both;
+  }
+  .bw-nav-item {
+    transition: background-color var(--bw-motion-duration-short) var(--bw-motion-ease),
+      color var(--bw-motion-duration-short) var(--bw-motion-ease);
+  }
+}
+
+@keyframes bw-fade {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}

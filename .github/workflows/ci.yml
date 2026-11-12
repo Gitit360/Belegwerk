@@ -1,0 +1,44 @@
+name: ci
+
+on:
+  push:
+    branches: [main, "cursor/**"]
+  pull_request:
+    branches: [main]
+
+jobs:
+  rust:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: rustfmt, clippy
+      - name: fmt
+        run: cargo fmt --all -- --check
+      - name: clippy (crates)
+        run: cargo clippy --workspace --all-targets -- -D warnings
+      - name: test (crates)
+        run: cargo test --workspace
+
+  typescript:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install
+      - run: pnpm typecheck
+      - name: Vite production build (UI only)
+        run: pnpm --filter @belegwerk/desktop build
+
+  # Full Tauri packaging is macOS-primary; optional job may be added later on macos-latest.
+  tauri-note:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "Tauri GUI/bundle verify is macOS-primary; Linux CI covers crates + Vite."

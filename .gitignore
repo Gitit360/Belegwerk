@@ -1,0 +1,49 @@
+# Node / pnpm
+node_modules/
+dist/
+dist-ssr/
+*.local
+.npm
+.pnpm-store/
+
+# Rust
+target/
+**/*.rs.bk
+Cargo.lock.bak
+
+# Tauri / OS
+apps/desktop/src-tauri/target/
+apps/desktop/src-tauri/gen/
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+
+# IDE
+.idea/
+.vscode/*
+!.vscode/extensions.json
+
+# Env / secrets (never commit real credentials)
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+credentials.json
+
+# App data / local belege (never commit productive originals)
+.data/
+data_root/
+*.sqlite
+*.sqlite3
+*.db
+
+# Logs / coverage
+coverage/
+*.log
+playwright-report/
+test-results/
+
+# Generated
+*.tsbuildinfo

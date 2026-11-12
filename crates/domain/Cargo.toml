@@ -1,0 +1,13 @@
+[package]
+name = "belegwerk-domain"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description = "Deterministic domain types for Belegwerk (no tax rules invented)"
+
+[dependencies]
+serde = { workspace = true }
+serde_json = { workspace = true }
+thiserror = { workspace = true }
+uuid = { workspace = true }
+chrono = { workspace = true }

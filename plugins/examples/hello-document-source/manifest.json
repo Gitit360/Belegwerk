@@ -1,0 +1,19 @@
+{
+  "id": "belegwerk.example.hello-document-source",
+  "version": "0.0.1",
+  "sdkVersion": "1",
+  "kind": "document-source",
+  "displayName": "Hello Document Source",
+  "description": "Synthetisches Beispielplugin — keine echten Belege",
+  "capabilities": ["documents.list", "documents.download"],
+  "permissions": {
+    "networkDomains": [],
+    "filesystem": [],
+    "credentialScopes": [],
+    "maxRuntimeMs": 60000,
+    "maxMemoryMb": 256
+  },
+  "entrypoint": "stub",
+  "development": true,
+  "signature": null
+}
