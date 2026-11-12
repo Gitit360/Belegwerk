@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { MatchingWorkbench } from "./MatchingWorkbench";
 import { NAV_ITEMS, PLACEHOLDER_COPY, type NavId } from "./nav";
 
 type HealthInfo = {
@@ -65,7 +66,10 @@ export function App() {
           </ul>
         </nav>
       </aside>
-      <main className="bw-main bw-fade-in" key={active}>
+      <main
+        className={`bw-main bw-fade-in${active === "matching" ? " is-wide" : ""}`}
+        key={active}
+      >
         <header className="bw-main-header">
           <h2>{copy.title}</h2>
           <p className="bw-lede">{copy.body}</p>
@@ -102,12 +106,7 @@ function ModulePanel({ id }: { id: NavId }) {
         </p>
       );
     case "matching":
-      return (
-        <p>
-          Statusdimensionen: Dokumentvollständigkeit, Match, Extraktion, Buchung, Export. Viele-zu-viele
-          Matching-Typen liegen im Domain-Crate; Arbeitsoberfläche folgt.
-        </p>
-      );
+      return <MatchingWorkbench />;
     case "accounting":
       return (
         <p>
@@ -187,6 +186,9 @@ const shellCss = `
 .bw-main {
   padding: var(--bw-space-8);
   max-width: 52rem;
+}
+.bw-main.is-wide {
+  max-width: 72rem;
 }
 .bw-main-header h2 {
   margin: 0 0 var(--bw-space-2);

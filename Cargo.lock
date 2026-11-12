@@ -34,12 +34,15 @@ name = "belegwerk-application"
 version = "0.1.0"
 dependencies = [
  "belegwerk-domain",
+ "belegwerk-infrastructure",
  "belegwerk-plugin-host",
  "chrono",
  "hex",
+ "rusqlite",
  "serde",
  "serde_json",
  "sha2",
+ "tempfile",
  "thiserror",
  "uuid",
 ]

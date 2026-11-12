@@ -46,10 +46,20 @@ pub fn initial_status() -> StatusDimensions {
 pub fn v1_routes() -> &'static [(&'static str, &'static str)] {
     &[
         ("GET /v1/health", "Liveness"),
+        ("GET /v1/status", "Short German status"),
         ("GET /v1/status-dimensions/initial", "Matching status stub"),
         (
             "GET /v1/tax-drafts/{kind}/{period}",
             "Tax return draft shell",
+        ),
+        ("POST /v1/imports", "Gated document import"),
+        (
+            "POST /v1/match/suggestions",
+            "Amount/reference match heuristics",
+        ),
+        (
+            "POST /v1/journal/drafts",
+            "Balanced journal draft / blocked cases",
         ),
         ("POST /v1/approvals", "Create action approval"),
         ("POST /v1/bank/payments", "Always 403 — not implemented"),
