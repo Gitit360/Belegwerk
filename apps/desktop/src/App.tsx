@@ -1,4 +1,11 @@
 import { useEffect, useState } from "react";
+import {
+  AccountsPage,
+  ArchivePage,
+  AutomationsPage,
+  MissingPage,
+  ReportsPage,
+} from "./FixturePages";
 import { MatchingWorkbench } from "./MatchingWorkbench";
 import { NAV_ITEMS, PLACEHOLDER_COPY, type NavId } from "./nav";
 
@@ -99,28 +106,25 @@ function ModulePanel({ id }: { id: NavId }) {
         </p>
       );
     case "accounts":
-      return (
-        <p>
-          MoneyMoney-Adapter ist Read-only. Capability <code>bank.transactions.read</code> erlaubt;
-          <code> bank.payment.create</code> existiert nicht und wird vom Gate verweigert.
-        </p>
-      );
+      return <AccountsPage />;
     case "matching":
       return <MatchingWorkbench />;
+    case "missing":
+      return <MissingPage />;
+    case "archive":
+      return <ArchivePage />;
     case "accounting":
       return (
         <p>
           SKR03-Kontenrahmen-Platzhalter ohne Steuersätze. Buchungsentwürfe ohne freigegebenes
-          Regelpaket sind nicht festschreibbar (<code>BlockedUnsupported</code>).
+          Regelpaket sind nicht festschreibbar (<code>BlockedUnsupported</code>). Bankzahlungen
+          bleiben dauerhaft gesperrt.
         </p>
       );
+    case "reports":
+      return <ReportsPage />;
     case "automations":
-      return (
-        <p>
-          Plugin-Host stub (<code>sdkVersion: &quot;1&quot;</code>). Connectoren MoneyMoney / GrandTotal /
-          hello-document-source sind Development-Stubs ohne Live-Credentials.
-        </p>
-      );
+      return <AutomationsPage />;
     default:
       return (
         <p>
@@ -212,6 +216,27 @@ const shellCss = `
   margin-top: var(--bw-space-4);
   color: var(--bw-color-text-secondary);
   font-size: 0.9rem;
+}
+.bw-fixture-note, .bw-list-meta {
+  color: var(--bw-color-text-secondary);
+  font-size: 0.9rem;
+}
+.bw-simple-list {
+  list-style: none;
+  margin: var(--bw-space-3) 0 0;
+  padding: 0;
+  display: grid;
+  gap: var(--bw-space-2);
+}
+.bw-simple-list li {
+  padding: var(--bw-space-3);
+  border: 1px solid var(--bw-color-border-subtle);
+  border-radius: var(--bw-radius-sm);
+  background: var(--bw-color-surface-muted);
+}
+.bw-subhead {
+  margin: var(--bw-space-4) 0 var(--bw-space-2);
+  font-size: 0.95rem;
 }
 code {
   font-family: var(--bw-font-mono);
