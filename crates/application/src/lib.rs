@@ -4,13 +4,16 @@ pub mod actions;
 pub mod approval;
 pub mod archive;
 pub mod audit;
+pub mod bank_import;
 pub mod commands;
+pub mod http_stub;
 pub mod import_pipeline;
 pub mod journal;
 pub mod local_api;
 pub mod matching_engine;
 pub mod matching_service;
 pub mod permission;
+pub mod reminders_service;
 
 pub use approval::{ActionApproval, ApprovalService};
 pub use audit::{AuditEvent, AuditSink, InMemoryAuditSink};
