@@ -4,7 +4,9 @@ use belegwerk_application::audit::InMemoryAuditSink;
 use belegwerk_application::bank_import::{BankImportService, SourceTransactionInput};
 use belegwerk_application::commands::{AppCommand, CommandBus};
 use belegwerk_application::import_pipeline::{ImportFile, ImportPipeline};
-use belegwerk_application::journal::{assert_balanced, can_post, draft_expense_against_bank, JournalError};
+use belegwerk_application::journal::{
+    assert_balanced, can_post, draft_expense_against_bank, JournalError,
+};
 use belegwerk_application::matching_engine::{DocumentMatchInput, MatchingEngine};
 use belegwerk_application::permission::{
     PermissionDecision, PermissionGate, PermissionRequest, ResourceRef, Scope,
@@ -155,7 +157,10 @@ fn journal_balance_and_draft_pack_gate() {
     ];
     assert!(matches!(
         assert_balanced(&unbalanced),
-        Err(JournalError::Unbalanced { debit: 10, credit: 9 })
+        Err(JournalError::Unbalanced {
+            debit: 10,
+            credit: 9
+        })
     ));
 
     let draft_pack = TaxRulePackRef {
