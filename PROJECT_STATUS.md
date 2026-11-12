@@ -8,7 +8,7 @@ Repository: `Gitit360/Belegwerk`
 | PR | Branch | Focus |
 |---|---|---|
 | [#1](https://github.com/Gitit360/Belegwerk/pull/1) | `cursor/m00-m01-scaffold-0636` | M00 docs + scaffold foundation |
-| (upcoming) | `cursor/vertical-slices-m02-m13-0636` | Working vertical slices M02/M03/M05/M11/M13 |
+| [#2](https://github.com/Gitit360/Belegwerk/pull/2) | `cursor/vertical-slices-m02-m13-0636` | Working vertical slices M02/M03/M05/M11/M13 (stacked on #1) |
 
 ---
 
