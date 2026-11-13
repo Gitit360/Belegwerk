@@ -98,8 +98,8 @@ impl MatchingWorkflow<'_> {
         self.paths
             .ensure()
             .map_err(|e| MatchWorkflowError::Storage(e.to_string()))?;
-        let conn =
-            open_db(&self.paths.db_path()).map_err(|e| MatchWorkflowError::Storage(e.to_string()))?;
+        let conn = open_db(&self.paths.db_path())
+            .map_err(|e| MatchWorkflowError::Storage(e.to_string()))?;
         migrate(&conn).map_err(|e| MatchWorkflowError::Storage(e.to_string()))?;
         Ok(conn)
     }
@@ -126,7 +126,9 @@ impl MatchingWorkflow<'_> {
     pub fn seed_synthetic_if_empty(&self) -> Result<(), MatchWorkflowError> {
         let conn = self.conn()?;
         let n: i64 = conn
-            .query_row("SELECT COUNT(*) FROM economic_transactions", [], |r| r.get(0))
+            .query_row("SELECT COUNT(*) FROM economic_transactions", [], |r| {
+                r.get(0)
+            })
             .map_err(|e| MatchWorkflowError::Storage(e.to_string()))?;
         if n > 0 {
             return Ok(());
@@ -170,7 +172,9 @@ impl MatchingWorkflow<'_> {
                 |r| Ok((r.get::<_, i64>(0)?, r.get::<_, String>(1)?)),
             )
             .map_err(|_| {
-                MatchWorkflowError::Invalid(format!("unknown transaction {economic_transaction_id}"))
+                MatchWorkflowError::Invalid(format!(
+                    "unknown transaction {economic_transaction_id}"
+                ))
             })?;
         let already: i64 = conn
             .query_row(
@@ -647,12 +651,7 @@ fn preview_one(
         .unwrap_or(0);
     let rem = open_remainder(amount, allocated);
     if rem == 0 {
-        return Ok((
-            0,
-            0,
-            false,
-            Some(format!("kein offener Rest: {eco_label}")),
-        ));
+        return Ok((0, 0, false, Some(format!("kein offener Rest: {eco_label}"))));
     }
     if doc_amount > 0 && (doc_amount - amount.abs()).abs() > rem && doc_amount != amount.abs() {
         // amount mismatch beyond remainder window — still confirmable as exception note
@@ -666,11 +665,7 @@ fn preview_one(
             )),
         ));
     }
-    let alloc = rem.min(if doc_amount > 0 {
-        doc_amount
-    } else {
-        rem
-    });
+    let alloc = rem.min(if doc_amount > 0 { doc_amount } else { rem });
     Ok((alloc, rem - alloc, true, None))
 }
 
@@ -753,9 +748,7 @@ mod tests {
         };
         let snap = wf.snapshot().unwrap();
         assert_eq!(snap.transactions.len(), 2);
-        let pay = wf
-            .confirm("eco-synth-001", "doc-synth-001", None)
-            .unwrap();
+        let pay = wf.confirm("eco-synth-001", "doc-synth-001", None).unwrap();
         assert_eq!(pay.allocated_minor, 2499);
         let snap2 = wf.snapshot().unwrap();
         let tx = snap2

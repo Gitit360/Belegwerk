@@ -171,7 +171,9 @@ impl ReminderService {
     pub fn seed_demo_if_empty(&self) -> Result<(), ReminderError> {
         let conn = self.conn()?;
         let n: i64 = conn
-            .query_row("SELECT COUNT(*) FROM missing_document_cases", [], |r| r.get(0))
+            .query_row("SELECT COUNT(*) FROM missing_document_cases", [], |r| {
+                r.get(0)
+            })
             .map_err(|e| ReminderError::Storage(e.to_string()))?;
         if n > 0 {
             return Ok(());

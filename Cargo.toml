@@ -8,6 +8,7 @@ members = [
   "crates/infrastructure",
   "crates/plugin-host",
 ]
+exclude = ["apps/desktop/src-tauri"]
 
 [workspace.package]
 version = "0.1.0"

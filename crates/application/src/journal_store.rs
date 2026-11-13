@@ -50,8 +50,8 @@ impl JournalStore<'_> {
         self.paths
             .ensure()
             .map_err(|e| JournalStoreError::Storage(e.to_string()))?;
-        let conn =
-            open_db(&self.paths.db_path()).map_err(|e| JournalStoreError::Storage(e.to_string()))?;
+        let conn = open_db(&self.paths.db_path())
+            .map_err(|e| JournalStoreError::Storage(e.to_string()))?;
         migrate(&conn).map_err(|e| JournalStoreError::Storage(e.to_string()))?;
         Ok(conn)
     }
@@ -370,9 +370,7 @@ mod tests {
                 kind: "journal".into(),
                 id: Some("j-synth-ok".into()),
             },
-            Scope {
-                label: "t".into(),
-            },
+            Scope { label: "t".into() },
             "",
             "t",
         );

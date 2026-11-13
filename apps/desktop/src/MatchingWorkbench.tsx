@@ -3,7 +3,8 @@ import { api } from "./api/client";
 import { formatMoney } from "./fixtures/matchingWorkbench";
 import { EmptyState, ErrorState, LoadingState, fixtureStateCss } from "./uiStates";
 
-type Snap = Awaited<ReturnType<typeof api.matchingSnapshot>> & {
+type Snap = {
+  note: string;
   transactions: Array<{
     id: string;
     bookingDate: string;

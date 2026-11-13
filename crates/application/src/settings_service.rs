@@ -78,7 +78,8 @@ impl SettingsService<'_> {
         let conn =
             open_db(&self.paths.db_path()).map_err(|e| SettingsError::Storage(e.to_string()))?;
         migrate(&conn).map_err(|e| SettingsError::Storage(e.to_string()))?;
-        let json = serde_json::to_string(profile).map_err(|e| SettingsError::Storage(e.to_string()))?;
+        let json =
+            serde_json::to_string(profile).map_err(|e| SettingsError::Storage(e.to_string()))?;
         conn.execute(
             "INSERT INTO settings_kv(key, value_json, updated_at) VALUES (?1, ?2, ?3)
              ON CONFLICT(key) DO UPDATE SET value_json=excluded.value_json, updated_at=excluded.updated_at",

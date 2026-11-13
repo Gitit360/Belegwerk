@@ -1,16 +1,21 @@
 import { useEffect, useState } from "react";
+import { api } from "./api/client";
 import {
-  AccountingPage,
   AccountsPage,
   ArchivePage,
   AutomationsPage,
-  MissingPage,
   PlaceholderModulePage,
   ReportsPage,
 } from "./FixturePages";
 import { MatchingWorkbench } from "./MatchingWorkbench";
 import { NAV_ITEMS, PLACEHOLDER_COPY, type NavId } from "./nav";
 import { ErrorState, LoadingState, fixtureStateCss } from "./uiStates";
+import {
+  AccountingWorkflowPage,
+  InboxPage,
+  MissingWorkflowPage,
+  SettingsWorkflowPage,
+} from "./workflowPages";
 
 type HealthInfo = {
   app: string;
@@ -48,19 +53,21 @@ export function App() {
   useEffect(() => {
     let cancelled = false;
     setHealthLoad("loading");
-    void loadHealth()
-      .then((h) => {
+    void (async () => {
+      await api.initDataRoot();
+      try {
+        const h = await loadHealth();
         if (!cancelled) {
           setHealth(h);
           setHealthLoad("ready");
         }
-      })
-      .catch(() => {
+      } catch {
         if (!cancelled) {
           setHealth(FALLBACK_HEALTH);
           setHealthLoad("error");
         }
-      });
+      }
+    })();
     return () => {
       cancelled = true;
     };
@@ -132,20 +139,24 @@ function ModulePanel({ id }: { id: NavId }) {
           blockiert.
         </p>
       );
+    case "inbox":
+      return <InboxPage />;
     case "accounts":
       return <AccountsPage />;
     case "matching":
       return <MatchingWorkbench />;
     case "missing":
-      return <MissingPage />;
+      return <MissingWorkflowPage />;
     case "archive":
       return <ArchivePage />;
     case "accounting":
-      return <AccountingPage />;
+      return <AccountingWorkflowPage />;
     case "reports":
       return <ReportsPage />;
     case "automations":
       return <AutomationsPage />;
+    case "settings":
+      return <SettingsWorkflowPage />;
     default:
       return <PlaceholderModulePage title={PLACEHOLDER_COPY[id].title} />;
   }

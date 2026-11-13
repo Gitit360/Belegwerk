@@ -19,7 +19,10 @@ pub mod time;
 pub use document::{ContentHash, DocumentMeta, ImportBatch, ObjectKey};
 pub use finance::{EconomicTransaction, SourceTransaction, TransactionStatus};
 pub use ids::{DocumentId, EconomicTransactionId, ImportBatchId, SourceTransactionId};
-pub use matching::{BatchPreview, MatchCandidate, MatchConfidence, MatchDecision, MatchDecisionKind, PaymentAllocation, StatusDimensions};
-pub use settings::{ReportingCadence, TaxProfileSettings, VatMethod};
+pub use matching::{
+    BatchPreview, MatchCandidate, MatchConfidence, MatchDecision, MatchDecisionKind,
+    PaymentAllocation, StatusDimensions,
+};
 pub use money::{CurrencyCode, MoneyAmount};
+pub use settings::{ReportingCadence, TaxProfileSettings, VatMethod};
 pub use time::CalendarDate;
