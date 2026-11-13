@@ -16,12 +16,16 @@ pub mod jobs;
 pub mod journal;
 pub mod local_api;
 pub mod mail_portal;
+pub mod import_query;
+pub mod journal_store;
 pub mod matching_engine;
 pub mod matching_service;
+pub mod matching_workflow;
 pub mod moneymoney_replay;
 pub mod permission;
 pub mod reminders_service;
 pub mod reports;
+pub mod settings_service;
 
 pub use approval::{ActionApproval, ApprovalService};
 pub use audit::{AuditEvent, AuditSink, InMemoryAuditSink};

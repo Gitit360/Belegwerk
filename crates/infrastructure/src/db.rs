@@ -170,6 +170,40 @@ pub const MIGRATIONS: &[&str] = &[
       CHECK (1)
     );
     "#,
+    // 3 — core workflow persistence (match decisions, allocations, settings, journal flags)
+    r#"
+    CREATE TABLE IF NOT EXISTS match_decisions (
+      id TEXT PRIMARY KEY NOT NULL,
+      economic_transaction_id TEXT NOT NULL,
+      document_id TEXT NOT NULL,
+      decision TEXT NOT NULL,
+      confidence TEXT NOT NULL,
+      reason TEXT NOT NULL,
+      decided_at TEXT NOT NULL,
+      UNIQUE(economic_transaction_id, document_id)
+    );
+
+    CREATE TABLE IF NOT EXISTS payment_allocations (
+      id TEXT PRIMARY KEY NOT NULL,
+      economic_transaction_id TEXT NOT NULL,
+      document_id TEXT NOT NULL,
+      allocated_minor INTEGER NOT NULL,
+      currency TEXT NOT NULL,
+      created_at TEXT NOT NULL
+    );
+
+    CREATE INDEX IF NOT EXISTS idx_alloc_eco ON payment_allocations(economic_transaction_id);
+
+    CREATE TABLE IF NOT EXISTS settings_kv (
+      key TEXT PRIMARY KEY NOT NULL,
+      value_json TEXT NOT NULL,
+      updated_at TEXT NOT NULL
+    );
+
+    ALTER TABLE journal_entries ADD COLUMN blocked_unsupported INTEGER NOT NULL DEFAULT 0;
+    ALTER TABLE journal_entries ADD COLUMN block_reason TEXT;
+    ALTER TABLE journal_entries ADD COLUMN rule_pack_status TEXT;
+    "#,
 ];
 
 pub fn open_db(path: &Path) -> Result<Connection, DbError> {

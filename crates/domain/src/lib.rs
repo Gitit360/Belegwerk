@@ -13,11 +13,13 @@ pub mod matching;
 pub mod money;
 pub mod reminders;
 pub mod reporting;
+pub mod settings;
 pub mod time;
 
 pub use document::{ContentHash, DocumentMeta, ImportBatch, ObjectKey};
 pub use finance::{EconomicTransaction, SourceTransaction, TransactionStatus};
 pub use ids::{DocumentId, EconomicTransactionId, ImportBatchId, SourceTransactionId};
-pub use matching::{MatchCandidate, MatchConfidence, StatusDimensions};
+pub use matching::{BatchPreview, MatchCandidate, MatchConfidence, MatchDecision, MatchDecisionKind, PaymentAllocation, StatusDimensions};
+pub use settings::{ReportingCadence, TaxProfileSettings, VatMethod};
 pub use money::{CurrencyCode, MoneyAmount};
 pub use time::CalendarDate;

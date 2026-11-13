@@ -116,6 +116,12 @@ impl PermissionGate {
                     | "mail.search"
                     | "mail.draft.create"
                     | "export.build"
+                    | "match.confirm"
+                    | "match.reject"
+                    | "reminder.escalate"
+                    | "reminder.complete"
+                    | "settings.write"
+                    | "journal.draft.save"
             )
         {
             PermissionDecision::Allow

@@ -116,6 +116,82 @@ impl ReminderService {
         }
         Ok(out)
     }
+
+    pub fn list_open_detailed(&self) -> Result<Vec<MissingCaseRow>, ReminderError> {
+        let conn = self.conn()?;
+        let mut stmt = conn
+            .prepare(
+                "SELECT id, COALESCE(note, ''), escalation_level, status, created_at,
+                        COALESCE(economic_transaction_id, '')
+                 FROM missing_document_cases
+                 WHERE status != 'resolved' AND status != 'dismissed'
+                 ORDER BY created_at",
+            )
+            .map_err(|e| ReminderError::Storage(e.to_string()))?;
+        let rows = stmt
+            .query_map([], |r| {
+                Ok(MissingCaseRow {
+                    id: r.get(0)?,
+                    note: r.get(1)?,
+                    escalation_level: r.get(2)?,
+                    status: r.get(3)?,
+                    created_at: r.get(4)?,
+                    economic_transaction_id: {
+                        let s: String = r.get(5)?;
+                        if s.is_empty() {
+                            None
+                        } else {
+                            Some(s)
+                        }
+                    },
+                })
+            })
+            .map_err(|e| ReminderError::Storage(e.to_string()))?;
+        let mut out = Vec::new();
+        for row in rows {
+            out.push(row.map_err(|e| ReminderError::Storage(e.to_string()))?);
+        }
+        Ok(out)
+    }
+
+    pub fn complete(&self, case_id: uuid::Uuid) -> Result<(), ReminderError> {
+        let conn = self.conn()?;
+        let n = conn
+            .execute(
+                "UPDATE missing_document_cases SET status = 'resolved' WHERE id = ?1",
+                [case_id.to_string()],
+            )
+            .map_err(|e| ReminderError::Storage(e.to_string()))?;
+        if n == 0 {
+            return Err(ReminderError::Storage(format!("case not found: {case_id}")));
+        }
+        Ok(())
+    }
+
+    pub fn seed_demo_if_empty(&self) -> Result<(), ReminderError> {
+        let conn = self.conn()?;
+        let n: i64 = conn
+            .query_row("SELECT COUNT(*) FROM missing_document_cases", [], |r| r.get(0))
+            .map_err(|e| ReminderError::Storage(e.to_string()))?;
+        if n > 0 {
+            return Ok(());
+        }
+        drop(conn);
+        let case = self.open_case("Beleg zu mm-synth-001 fehlt (synthetisch)", None)?;
+        self.attach_placeholder(case.id, "DocumentPlaceholder: Vendor PDF ausstehend")?;
+        Ok(())
+    }
+}
+
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct MissingCaseRow {
+    pub id: String,
+    pub note: String,
+    pub escalation_level: i64,
+    pub status: String,
+    pub created_at: String,
+    pub economic_transaction_id: Option<String>,
 }
 
 #[cfg(test)]
@@ -139,5 +215,7 @@ mod tests {
         let level = svc.escalate(case.id).unwrap();
         assert_eq!(level, 1);
         assert_eq!(svc.list_open().unwrap().len(), 1);
+        svc.complete(case.id).unwrap();
+        assert!(svc.list_open().unwrap().is_empty());
     }
 }

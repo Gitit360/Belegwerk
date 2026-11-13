@@ -16,6 +16,12 @@ pub enum KnownAction {
     ExportBuild,
     DeliverySubmit,
     PluginInstall,
+    MatchConfirm,
+    MatchReject,
+    ReminderEscalate,
+    ReminderComplete,
+    SettingsWrite,
+    JournalDraftSave,
     /// Explicitly unsupported — gate always denies.
     BankPaymentCreate,
 }
@@ -34,6 +40,12 @@ impl KnownAction {
             Self::ExportBuild => "export.build",
             Self::DeliverySubmit => "delivery.submit",
             Self::PluginInstall => "plugin.install",
+            Self::MatchConfirm => "match.confirm",
+            Self::MatchReject => "match.reject",
+            Self::ReminderEscalate => "reminder.escalate",
+            Self::ReminderComplete => "reminder.complete",
+            Self::SettingsWrite => "settings.write",
+            Self::JournalDraftSave => "journal.draft.save",
             Self::BankPaymentCreate => "bank.payment.create",
         }
     }
