@@ -27,5 +27,8 @@ Keine GoBD-/Steuerkonformitäts-Claims ohne fachliche Prüfung.
 | [plugins/PLUGIN_SPEC.md](./plugins/PLUGIN_SPEC.md) | Plugin-Vertrag |
 | [operations/BACKUP_RESTORE.md](./operations/BACKUP_RESTORE.md) | Backup/Restore Stub |
 | [acceptance/M00_ACCEPTANCE.md](./acceptance/M00_ACCEPTANCE.md) | M00-Abnahme |
+| [accounting/TAX_RULE_REGISTER_v2026.md](./accounting/TAX_RULE_REGISTER_v2026.md) | Steuerregel-Register (quellenbasiert) |
+| [accounting/CASE_MATRIX_v1.md](./accounting/CASE_MATRIX_v1.md) | Fallmatrix v1 |
+| [accounting/SOURCES_TAX.md](./accounting/SOURCES_TAX.md) | Steuerquellen Nov 2026 |
 
 Siehe auch Root: `PROJECT_STATUS.md`, `OPEN_QUESTIONS.md`.

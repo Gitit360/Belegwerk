@@ -1,0 +1,36 @@
+/* Design-Token-Stub — Captain’s Mist (aus Panopticon-Console / dexcom-cockpit) */
+:root {
+  --color-canvas: #8b999a;
+  --color-shell: #afc5c0;
+  --color-surface: #c3d4d0;
+  --color-surface-raised: #d9e3e0;
+  --color-surface-bright: #f2f6f4;
+  --color-text: #172321;
+  --color-text-muted: #485d58;
+  --color-accent: #e7ff3f;
+  --color-accent-hover: #daf52f;
+  --color-border: rgb(23 35 33 / 13%);
+
+  /* Status (Buttons, Badges) */
+  --color-success: #2f6b4f;
+  --color-success-fg: #f0faf4;
+  --color-success-hover: #265a42;
+
+  /* Meldungen / Alerts */
+  --color-message-error-bg: #c45a12;
+  --color-message-error-fg: #fff8f0;
+  --color-message-error-border: #9a4208;
+  --color-message-ok-bg: var(--color-success);
+  --color-message-ok-fg: var(--color-success-fg);
+  --color-message-ok-border: #1f4d38;
+  --color-message-info-bg: #3d5a66;
+  --color-message-info-fg: #f2f7f9;
+  --color-message-info-border: #2a4049;
+
+  --font-family-sans: "DM Sans", "Avenir Next", "Segoe UI", system-ui, sans-serif;
+  --radius-card: 0.5rem;
+  --radius-pill: 999px;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-6: 1.5rem;
+}

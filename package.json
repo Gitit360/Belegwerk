@@ -10,10 +10,11 @@
     "typecheck": "pnpm -r --if-present typecheck",
     "lint": "pnpm -r --if-present lint",
     "test": "pnpm -r --if-present test",
-    "check:rust": "cargo fmt --all -- --check && cargo clippy --workspace --all-targets -- -D warnings && cargo test --workspace",
+    "check:silicon": "bash scripts/ensure-apple-silicon.sh",
+    "check:rust": "bash scripts/ensure-apple-silicon.sh && cargo fmt --all -- --check && cargo clippy --workspace --all-targets -- -D warnings && cargo test --workspace",
     "fmt:rust": "cargo fmt --all",
-    "tauri:dev": "pnpm --filter @belegwerk/desktop tauri:dev",
-    "tauri:build": "pnpm --filter @belegwerk/desktop tauri:build"
+    "tauri:dev": "bash scripts/ensure-apple-silicon.sh && pnpm --filter @belegwerk/desktop tauri:dev",
+    "tauri:build": "bash scripts/ensure-apple-silicon.sh && pnpm --filter @belegwerk/desktop tauri:build"
   },
   "engines": {
     "node": ">=20"

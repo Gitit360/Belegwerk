@@ -103,6 +103,12 @@ pub fn skr03_seed_accounts() -> Vec<ChartAccount> {
             kind: AccountKind::Tax,
             skr_variant: "SKR03".into(),
         },
+        ChartAccount {
+            code: "1800".into(),
+            name: "Privatentnahmen (gemischte Nutzung)".into(),
+            kind: AccountKind::Equity,
+            skr_variant: "SKR03".into(),
+        },
     ]
 }
 

@@ -29,6 +29,8 @@ Diese Links sind **Rechercheeinstiege**, keine unveränderlichen Spezifikationen
 | ELSTER Entwickler | https://www.elster.de/elsterweb/infoseite/entwickler?locale=de_DE | M15 ERiC |
 | ELSTER EÜR | https://www.elster.de/eportal/formulare-leistungen/alleformulare/euer | Vor M12 Feldmapping |
 
+Steuerrecherche Nov 2026 (Regelregister): siehe `docs/accounting/SOURCES_TAX.md` und `docs/accounting/TAX_RULE_REGISTER_v2026.md`.
+
 ## Design-/Workflow-Inspiration (nicht Compliance)
 
 Receipts Space, DEVONthink, Accountable, sevdesk, GetMyInvoices — Inspiration nur. Keine fremden Assets, Texte oder proprietären Implementierungen kopieren.

@@ -1,12 +1,9 @@
-use belegwerk_infrastructure::{migrate, open_db, DataPaths, FsBlobStore, BlobStore};
-use serde::Serialize;
-use std::sync::Mutex;
-use tauri::Manager;
+mod commands;
 
-#[derive(Default)]
-struct AppState {
-    data_root: Mutex<Option<std::path::PathBuf>>,
-}
+use belegwerk_infrastructure::{migrate, open_db, BlobStore, DataPaths, FsBlobStore};
+use commands::AppState;
+use serde::Serialize;
+use tauri::Manager;
 
 #[derive(Serialize)]
 struct HealthInfo {
@@ -29,7 +26,10 @@ fn health() -> HealthInfo {
 }
 
 #[tauri::command]
-fn init_data_root(app: tauri::AppHandle, state: tauri::State<'_, AppState>) -> Result<String, String> {
+fn init_data_root(
+    app: tauri::AppHandle,
+    state: tauri::State<'_, AppState>,
+) -> Result<String, String> {
     let dir = app
         .path()
         .app_data_dir()
@@ -42,7 +42,10 @@ fn init_data_root(app: tauri::AppHandle, state: tauri::State<'_, AppState>) -> R
     let version = migrate(&conn).map_err(|e| e.to_string())?;
     let _store = FsBlobStore::new(paths.clone()).map_err(|e| e.to_string())?;
     *state.data_root.lock().map_err(|e| e.to_string())? = Some(dir.clone());
-    Ok(format!("data_root={} schema_version={version}", dir.display()))
+    Ok(format!(
+        "data_root={} schema_version={version}",
+        dir.display()
+    ))
 }
 
 #[tauri::command]
@@ -63,7 +66,37 @@ pub fn run() {
     tauri::Builder::default()
         .plugin(tauri_plugin_shell::init())
         .manage(AppState::default())
-        .invoke_handler(tauri::generate_handler![health, init_data_root, put_synthetic_blob])
+        .invoke_handler(tauri::generate_handler![
+            health,
+            init_data_root,
+            put_synthetic_blob,
+            commands::ensure_schema,
+            commands::matching_snapshot,
+            commands::matching_confirm,
+            commands::matching_reject,
+            commands::matching_batch_preview,
+            commands::matching_rebuild,
+            commands::import_synthetic_files,
+            commands::import_list_batches,
+            commands::import_list_documents,
+            commands::import_preview_blob,
+            commands::accounts_snapshot,
+            commands::accounts_replay_fixtures,
+            commands::accounts_live_moneymoney,
+            commands::mail_live_search,
+            commands::keychain_ensure_slot,
+            commands::reports_snapshot,
+            commands::archive_snapshot,
+            commands::macos_capability_probes,
+            commands::reminders_list,
+            commands::reminders_escalate,
+            commands::reminders_complete,
+            commands::journal_list_drafts,
+            commands::journal_approve_draft,
+            commands::journal_grant_booking_approval,
+            commands::settings_get_tax_profile,
+            commands::settings_save_tax_profile,
+        ])
         .run(tauri::generate_context!())
         .expect("error while running Belegwerk");
 }

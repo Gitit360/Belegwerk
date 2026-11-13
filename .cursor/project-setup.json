@@ -1,0 +1,21 @@
+{
+  "version": 1,
+  "completedAt": "2026-11-13T05:55:00.000Z",
+  "project": "Belegwerk",
+  "brandkit": {
+    "mode": "defaults"
+  },
+  "docs": {
+    "create": false,
+    "path": "docs"
+  },
+  "designTokens": {
+    "mode": "stub",
+    "target": "design-tokens.css",
+    "source": "Panopticon-Console/design-tokens.css (Captain’s Mist)"
+  },
+  "created": [
+    "design-tokens.css",
+    "packages/design-system/src/tokens.css"
+  ]
+}

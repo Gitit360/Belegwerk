@@ -1,111 +1,133 @@
 /*
-  Belegwerk design tokens (REQ-U-004).
-  Light default + dark via data-theme / prefers-color-scheme.
-  Cool slate + forest accent — avoid purple-on-white / cream-serif clichés.
+  Belegwerk design tokens — Captain’s Mist
+  Source: Panopticon-Console/design-tokens.css (dexcom-cockpit lineage)
+  --bw-* = app API · --color-* = Panopticon aliases
 */
 
 :root {
   color-scheme: light;
 
-  --bw-font-sans: "Source Sans 3", "Segoe UI", sans-serif;
-  --bw-font-display: "Fraunces", "Source Serif 4", Georgia, serif;
-  --bw-font-mono: "IBM Plex Mono", ui-monospace, monospace;
+  /* —— Panopticon / Captain’s Mist (canonical) —— */
+  --color-canvas: #8b999a;
+  --color-shell: #afc5c0;
+  --color-surface: #c3d4d0;
+  --color-surface-raised: #d9e3e0;
+  --color-surface-bright: #f2f6f4;
+  --color-text: #172321;
+  --color-text-muted: #485d58;
+  --color-accent: #e7ff3f;
+  --color-accent-hover: #daf52f;
+  --color-border: rgb(23 35 33 / 13%);
 
-  --bw-color-surface-default: #f3f5f4;
-  --bw-color-surface-elevated: #ffffff;
-  --bw-color-surface-selected: #e2ebe6;
-  --bw-color-surface-muted: #e8ecea;
-  --bw-color-text-primary: #15201b;
-  --bw-color-text-secondary: #4a5a52;
-  --bw-color-text-inverse: #f5f8f6;
-  --bw-color-border-subtle: #c9d4ce;
-  --bw-color-accent: #1f6b4a;
-  --bw-color-accent-hover: #18563b;
-  --bw-color-status-info: #2a5f8f;
+  --color-success: #2f6b4f;
+  --color-success-fg: #f0faf4;
+  --color-success-hover: #265a42;
+
+  --color-message-error-bg: #c45a12;
+  --color-message-error-fg: #fff8f0;
+  --color-message-error-border: #9a4208;
+  --color-message-ok-bg: var(--color-success);
+  --color-message-ok-fg: var(--color-success-fg);
+  --color-message-ok-border: #1f4d38;
+  --color-message-info-bg: #3d5a66;
+  --color-message-info-fg: #f2f7f9;
+  --color-message-info-border: #2a4049;
+
+  --font-family-sans: "DM Sans", "Avenir Next", "Segoe UI", system-ui, sans-serif;
+  --radius-card: 0.5rem;
+  --radius-pill: 999px;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-6: 1.5rem;
+
+  /* —— Belegwerk --bw-* mapped onto Mist —— */
+  --bw-font-sans: var(--font-family-sans);
+  --bw-font-display: var(--font-family-sans);
+  --bw-font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+
+  --bw-color-surface-default: var(--color-surface);
+  --bw-color-surface-elevated: var(--color-surface-raised);
+  --bw-color-surface-selected: color-mix(in srgb, var(--color-accent) 28%, var(--color-surface-raised));
+  --bw-color-surface-muted: var(--color-surface);
+  --bw-color-text-primary: var(--color-text);
+  --bw-color-text-secondary: var(--color-text-muted);
+  --bw-color-text-inverse: var(--color-text);
+  --bw-color-on-accent: var(--color-text);
+  --bw-color-border-subtle: var(--color-border);
+  --bw-color-accent: var(--color-accent);
+  --bw-color-accent-hover: var(--color-accent-hover);
+  --bw-color-status-info: var(--color-message-info-bg);
   --bw-color-status-warning: #9a6b12;
-  --bw-color-status-danger: #9b2c2c;
-  --bw-color-status-success: #1f6b4a;
-  --bw-color-focus-ring: #1f6b4a;
+  --bw-color-status-danger: var(--color-message-error-bg);
+  --bw-color-status-success: var(--color-success);
+  --bw-color-focus-ring: color-mix(in srgb, var(--color-accent) 55%, var(--color-text));
 
-  --bw-evidence-original: #1f6b4a;
+  --bw-evidence-original: var(--color-success);
   --bw-evidence-placeholder: #7a6a3a;
   --bw-evidence-unverified: #9a6b12;
-  --bw-action-requires-approval: #2a5f8f;
-  --bw-action-prohibited: #9b2c2c;
+  --bw-action-requires-approval: var(--color-message-info-bg);
+  --bw-action-prohibited: var(--color-message-error-bg);
 
   --bw-space-1: 0.25rem;
   --bw-space-2: 0.5rem;
-  --bw-space-3: 0.75rem;
-  --bw-space-4: 1rem;
-  --bw-space-6: 1.5rem;
+  --bw-space-3: var(--space-3);
+  --bw-space-4: var(--space-4);
+  --bw-space-6: var(--space-6);
   --bw-space-8: 2rem;
 
   --bw-size-row-compact: 2rem;
   --bw-size-nav-width: 15rem;
-  --bw-radius-sm: 0.35rem;
-  --bw-radius-md: 0.6rem;
+  --bw-radius-sm: var(--radius-card);
+  --bw-radius-md: var(--radius-card);
+  --bw-radius-pill: var(--radius-pill);
 
   --bw-focus-ring-width: 2px;
   --bw-motion-duration-short: 160ms;
   --bw-motion-duration-medium: 280ms;
   --bw-motion-ease: cubic-bezier(0.22, 1, 0.36, 1);
 
-  --bw-bg-atmosphere:
-    radial-gradient(1200px 600px at 10% -10%, #d7e6de 0%, transparent 55%),
-    radial-gradient(900px 500px at 100% 0%, #d9e3ef 0%, transparent 50%),
-    linear-gradient(180deg, #eef3f0 0%, var(--bw-color-surface-default) 40%);
+  --bw-bg-atmosphere: linear-gradient(
+    165deg,
+    var(--color-canvas) 0%,
+    var(--color-shell) 42%,
+    var(--color-surface) 100%
+  );
 }
 
 [data-theme="light"] {
   color-scheme: light;
 }
 
+/* Optional dark Mist (not in Panopticon; opt-in via data-theme only) */
 [data-theme="dark"] {
   color-scheme: dark;
-  --bw-color-surface-default: #121816;
-  --bw-color-surface-elevated: #1a221e;
-  --bw-color-surface-selected: #24332c;
-  --bw-color-surface-muted: #1c2621;
-  --bw-color-text-primary: #e8f0eb;
-  --bw-color-text-secondary: #a7b7ae;
-  --bw-color-text-inverse: #101612;
-  --bw-color-border-subtle: #2f3f37;
-  --bw-color-accent: #5fbf93;
-  --bw-color-accent-hover: #7ad0a8;
-  --bw-color-status-info: #6ea8d8;
+  --color-canvas: #1a2422;
+  --color-shell: #243330;
+  --color-surface: #2c3c38;
+  --color-surface-raised: #354843;
+  --color-surface-bright: #3f5550;
+  --color-text: #e8f0eb;
+  --color-text-muted: #a7b7ae;
+  --color-accent: #e7ff3f;
+  --color-accent-hover: #f0ff6a;
+  --color-border: rgb(232 240 235 / 14%);
+  --color-success: #5fbf93;
+  --color-success-fg: #101612;
+  --color-success-hover: #7ad0a8;
+  --color-message-error-bg: #c45a12;
+  --color-message-error-fg: #fff8f0;
+  --color-message-error-border: #9a4208;
+  --color-message-info-bg: #4a6d7a;
+  --color-message-info-fg: #f2f7f9;
+  --color-message-info-border: #3a5560;
+  --bw-color-surface-selected: color-mix(in srgb, var(--color-accent) 22%, var(--color-surface-raised));
   --bw-color-status-warning: #d4a94a;
-  --bw-color-status-danger: #e07171;
-  --bw-color-status-success: #5fbf93;
-  --bw-color-focus-ring: #5fbf93;
-  --bw-bg-atmosphere:
-    radial-gradient(1000px 500px at 0% 0%, #1c2a24 0%, transparent 55%),
-    radial-gradient(800px 400px at 100% 0%, #1a2430 0%, transparent 50%),
-    linear-gradient(180deg, #101612 0%, var(--bw-color-surface-default) 45%);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) {
-    color-scheme: dark;
-    --bw-color-surface-default: #121816;
-    --bw-color-surface-elevated: #1a221e;
-    --bw-color-surface-selected: #24332c;
-    --bw-color-surface-muted: #1c2621;
-    --bw-color-text-primary: #e8f0eb;
-    --bw-color-text-secondary: #a7b7ae;
-    --bw-color-text-inverse: #101612;
-    --bw-color-border-subtle: #2f3f37;
-    --bw-color-accent: #5fbf93;
-    --bw-color-accent-hover: #7ad0a8;
-    --bw-color-status-info: #6ea8d8;
-    --bw-color-status-warning: #d4a94a;
-    --bw-color-status-danger: #e07171;
-    --bw-color-status-success: #5fbf93;
-    --bw-color-focus-ring: #5fbf93;
-    --bw-bg-atmosphere:
-      radial-gradient(1000px 500px at 0% 0%, #1c2a24 0%, transparent 55%),
-      radial-gradient(800px 400px at 100% 0%, #1a2430 0%, transparent 50%),
-      linear-gradient(180deg, #101612 0%, var(--bw-color-surface-default) 45%);
-  }
+  --bw-bg-atmosphere: linear-gradient(
+    165deg,
+    var(--color-canvas) 0%,
+    var(--color-shell) 50%,
+    var(--color-surface) 100%
+  );
 }
 
 @media (prefers-reduced-motion: reduce) {

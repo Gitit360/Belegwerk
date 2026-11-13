@@ -15,7 +15,7 @@ Regel: Nur **echte macOS- oder externe Blocker**. Entschiedene Engineering-Defau
 | ERiC-Direktübermittlung (G-26) | Externe Registrierung + Plattformcheck, kein In-Repo-Mock | M15 |
 | Finale OSS-/Kommerzlizenz (D-09) | Nutzer-/Rechtsentscheid, kein Code-Default | Vor öffentlicher SDK-Freigabe |
 | Marken-/Namensrechte „Belegwerk“ (G-25) | Rechtliche Prüfung | Vor öffentlichem Marketing |
-| Produktiv-Steuerwerte (Sätze, GWG je Jahr) | Quellenpflicht; keine erfundenen Rechtsgewissheiten | Vor produktivem M11 |
+| Produktiv-Steuerwerte (Sätze, GWG je Jahr) | Teilweise geschlossen: `docs/accounting/TAX_RULE_REGISTER_v2026.md` + Domain-Pack; restliche Block-IDs offen | Fach-Checkbox auf Register; Parallelperiode |
 | Bank X konkrete Schnittstelle (G-28) | Phase-2 Extern; MoneyMoney zuerst | M15 |
 
 ---

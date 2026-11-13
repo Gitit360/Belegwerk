@@ -15,10 +15,22 @@ body {
   font-family: var(--bw-font-sans);
   color: var(--bw-color-text-primary);
   background: var(--bw-bg-atmosphere);
+  -webkit-font-smoothing: antialiased;
 }
 
 button {
   font: inherit;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+code,
+.mono {
+  font-family: var(--bw-font-mono);
+  font-size: 0.875em;
 }
 
 :focus-visible {
@@ -26,13 +38,82 @@ button {
   outline-offset: 2px;
 }
 
+/* Meldungen — Panopticon message pattern */
+.bw-message {
+  display: block;
+  max-width: 36rem;
+  border-radius: var(--bw-radius-md);
+  border: 1px solid transparent;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.8125rem;
+  line-height: 1.4;
+  white-space: pre-wrap;
+}
+
+.bw-message-error {
+  background: var(--color-message-error-bg);
+  color: var(--color-message-error-fg);
+  border-color: var(--color-message-error-border);
+}
+
+.bw-message-ok {
+  background: var(--color-message-ok-bg);
+  color: var(--color-message-ok-fg);
+  border-color: var(--color-message-ok-border);
+}
+
+.bw-message-info {
+  background: var(--color-message-info-bg);
+  color: var(--color-message-info-fg);
+  border-color: var(--color-message-info-border);
+}
+
+@keyframes busy-pulse {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 color-mix(in srgb, var(--color-accent) 0%, transparent);
+    filter: brightness(1);
+  }
+  50% {
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-accent) 35%, transparent);
+    filter: brightness(1.04);
+  }
+}
+
+@keyframes busy-pulse-soft {
+  0%,
+  100% {
+    background-color: transparent;
+  }
+  50% {
+    background-color: color-mix(in srgb, var(--color-accent) 14%, transparent);
+  }
+}
+
+.busy-pulse {
+  animation: busy-pulse 1.5s ease-in-out infinite;
+}
+
+.busy-pulse-soft {
+  animation: busy-pulse-soft 1.6s ease-in-out infinite;
+}
+
 @media (prefers-reduced-motion: no-preference) {
   .bw-fade-in {
     animation: bw-fade var(--bw-motion-duration-medium) var(--bw-motion-ease) both;
   }
   .bw-nav-item {
-    transition: background-color var(--bw-motion-duration-short) var(--bw-motion-ease),
-      color var(--bw-motion-duration-short) var(--bw-motion-ease);
+    transition:
+      background-color var(--bw-motion-duration-short) var(--bw-motion-ease),
+      color var(--bw-motion-duration-short) var(--bw-motion-ease),
+      box-shadow var(--bw-motion-duration-short) var(--bw-motion-ease);
+  }
+  .bw-btn,
+  .bw-btn-accent {
+    transition:
+      background-color var(--bw-motion-duration-short) var(--bw-motion-ease),
+      border-color var(--bw-motion-duration-short) var(--bw-motion-ease),
+      filter var(--bw-motion-duration-short) var(--bw-motion-ease);
   }
 }
 
@@ -44,5 +125,12 @@ button {
   to {
     opacity: 1;
     transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .busy-pulse,
+  .busy-pulse-soft {
+    animation: none;
   }
 }

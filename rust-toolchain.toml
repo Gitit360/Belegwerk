@@ -1,3 +1,5 @@
+# Apple Silicon: rustup host must be aarch64-apple-darwin (no Rosetta).
+# Stable tracks current Tauri 2 MSRV on macOS.
 [toolchain]
-channel = "1.85.0"
+channel = "stable"
 components = ["rustfmt", "clippy"]
