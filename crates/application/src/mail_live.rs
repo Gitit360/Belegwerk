@@ -2,7 +2,9 @@
 
 use crate::macos_probes::live_connectors_enabled;
 use belegwerk_domain::mail::MailHit;
+#[cfg(target_os = "macos")]
 use serde::Deserialize;
+#[cfg(target_os = "macos")]
 use std::process::Command;
 use thiserror::Error;
 
@@ -18,6 +20,7 @@ pub enum MailLiveError {
     Json(String),
 }
 
+#[cfg(target_os = "macos")]
 #[derive(Debug, Deserialize)]
 struct MailRow {
     id: String,
@@ -34,7 +37,7 @@ pub fn search_inbox_subject(needle: &str, limit: usize) -> Result<Vec<MailHit>, 
     #[cfg(not(target_os = "macos"))]
     {
         let _ = (needle, limit);
-        return Err(MailLiveError::NotMacos);
+        Err(MailLiveError::NotMacos)
     }
     #[cfg(target_os = "macos")]
     {
@@ -122,20 +125,14 @@ pub fn ensure_keychain_slot() -> Result<String, MailLiveError> {
     }
     #[cfg(not(target_os = "macos"))]
     {
-        return Err(MailLiveError::NotMacos);
+        Err(MailLiveError::NotMacos)
     }
     #[cfg(target_os = "macos")]
     {
         const SERVICE: &str = "Belegwerk";
         const ACCOUNT: &str = "live-connector-slot";
         let find = Command::new("security")
-            .args([
-                "find-generic-password",
-                "-s",
-                SERVICE,
-                "-a",
-                ACCOUNT,
-            ])
+            .args(["find-generic-password", "-s", SERVICE, "-a", ACCOUNT])
             .output()
             .map_err(|e| MailLiveError::Osascript(e.to_string()))?;
         if find.status.success() {

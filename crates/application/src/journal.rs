@@ -181,9 +181,17 @@ mod tests {
             draft_expense_with_private_share("j-priv", "4950", "1200", 1000, "EUR", 30, pack)
                 .unwrap();
         assert!(can_post(&draft).is_ok());
-        let priv_line = draft.lines.iter().find(|l| l.account_code == "1800").unwrap();
+        let priv_line = draft
+            .lines
+            .iter()
+            .find(|l| l.account_code == "1800")
+            .unwrap();
         assert_eq!(priv_line.debit_minor, 300);
-        let exp = draft.lines.iter().find(|l| l.account_code == "4950").unwrap();
+        let exp = draft
+            .lines
+            .iter()
+            .find(|l| l.account_code == "4950")
+            .unwrap();
         assert_eq!(exp.debit_minor, 700);
     }
 

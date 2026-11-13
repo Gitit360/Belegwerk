@@ -168,7 +168,10 @@ mod tests {
             purpose: Some("INV-SYNTH-1001 SaaS".into()),
             raw_ref: Some("tests/fixtures/synthetic/bank/mm-synth-001.json".into()),
         };
-        assert_eq!(svc.import_many(std::slice::from_ref(&input)).unwrap().len(), 1);
+        assert_eq!(
+            svc.import_many(std::slice::from_ref(&input)).unwrap().len(),
+            1
+        );
         assert_eq!(svc.import_many(&[input]).unwrap().len(), 1);
         let conn = open_db(&DataPaths::new(dir.path()).db_path()).unwrap();
         let n: i64 = conn

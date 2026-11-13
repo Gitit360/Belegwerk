@@ -158,12 +158,7 @@ impl MatchingWorkflow<'_> {
         document_id: &str,
         allocated_minor: Option<i64>,
     ) -> Result<PaymentAllocation, MatchWorkflowError> {
-        self.confirm_with_private_share(
-            economic_transaction_id,
-            document_id,
-            allocated_minor,
-            0,
-        )
+        self.confirm_with_private_share(economic_transaction_id, document_id, allocated_minor, 0)
     }
 
     /// Confirm allocation and create a journal draft (TAX-UST-RATE-19 / TAX-PRIVATE-SHARE).

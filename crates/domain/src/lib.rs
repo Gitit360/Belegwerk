@@ -18,7 +18,6 @@ pub mod tax_rules;
 pub mod time;
 
 pub use document::{ContentHash, DocumentMeta, ImportBatch, ObjectKey};
-pub use tax_rules::{TaxRulePack, TaxRuleError};
 pub use finance::{EconomicTransaction, SourceTransaction, TransactionStatus};
 pub use ids::{DocumentId, EconomicTransactionId, ImportBatchId, SourceTransactionId};
 pub use matching::{
@@ -27,4 +26,5 @@ pub use matching::{
 };
 pub use money::{CurrencyCode, MoneyAmount};
 pub use settings::{ReportingCadence, TaxProfileSettings, VatMethod};
+pub use tax_rules::{TaxRuleError, TaxRulePack};
 pub use time::CalendarDate;

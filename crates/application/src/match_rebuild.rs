@@ -28,8 +28,8 @@ impl MatchRebuildService {
         self.paths
             .ensure()
             .map_err(|e| MatchRebuildError::Storage(e.to_string()))?;
-        let conn =
-            open_db(&self.paths.db_path()).map_err(|e| MatchRebuildError::Storage(e.to_string()))?;
+        let conn = open_db(&self.paths.db_path())
+            .map_err(|e| MatchRebuildError::Storage(e.to_string()))?;
         migrate(&conn).map_err(|e| MatchRebuildError::Storage(e.to_string()))?;
         let store = FsBlobStore::new(self.paths.clone())
             .map_err(|e| MatchRebuildError::Storage(e.to_string()))?;

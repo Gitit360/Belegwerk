@@ -4,6 +4,7 @@
 use crate::bank_import::SourceTransactionInput;
 use crate::macos_probes::live_connectors_enabled;
 use serde::Deserialize;
+#[cfg(target_os = "macos")]
 use std::process::Command;
 use thiserror::Error;
 
@@ -42,14 +43,16 @@ struct MmTx {
 }
 
 /// Export booked transactions since `from_date` (YYYY-MM-DD) via AppleScript `export transactions … as "plist"`.
-pub fn fetch_transactions_since(from_date: &str) -> Result<Vec<SourceTransactionInput>, MoneyMoneyLiveError> {
+pub fn fetch_transactions_since(
+    from_date: &str,
+) -> Result<Vec<SourceTransactionInput>, MoneyMoneyLiveError> {
     if !live_connectors_enabled() {
         return Err(MoneyMoneyLiveError::LiveDisabled);
     }
     #[cfg(not(target_os = "macos"))]
     {
         let _ = from_date;
-        return Err(MoneyMoneyLiveError::NotMacos);
+        Err(MoneyMoneyLiveError::NotMacos)
     }
     #[cfg(target_os = "macos")]
     {
@@ -71,7 +74,9 @@ pub fn fetch_transactions_since(from_date: &str) -> Result<Vec<SourceTransaction
     }
 }
 
-pub fn parse_transaction_plist(bytes: &[u8]) -> Result<Vec<SourceTransactionInput>, MoneyMoneyLiveError> {
+pub fn parse_transaction_plist(
+    bytes: &[u8],
+) -> Result<Vec<SourceTransactionInput>, MoneyMoneyLiveError> {
     let export: TxExport =
         plist::from_bytes(bytes).map_err(|e| MoneyMoneyLiveError::Plist(e.to_string()))?;
     let mut out = Vec::new();

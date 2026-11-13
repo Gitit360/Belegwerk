@@ -109,10 +109,9 @@ impl TaxRulePack {
         let meta = self.rule(id)?;
         match meta.encode {
             RuleEncode::Blocked => Err(TaxRuleError::Blocked(id.into())),
-            RuleEncode::SuggestOnly => Err(TaxRuleError::NeedsConfirm(
-                id.into(),
-                "suggest_only".into(),
-            )),
+            RuleEncode::SuggestOnly => {
+                Err(TaxRuleError::NeedsConfirm(id.into(), "suggest_only".into()))
+            }
             RuleEncode::DefaultAfterConfirm => Ok(meta),
         }
     }

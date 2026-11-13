@@ -1,6 +1,7 @@
 //! Capability probes for macOS live connectors (feature-flagged; fixture remains default).
 
 use serde::{Deserialize, Serialize};
+#[cfg(target_os = "macos")]
 use std::process::Command;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -130,7 +131,8 @@ fn probe_mail() -> ProbeResult {
                 id: "apple_mail".into(),
                 available: running,
                 detail: if running {
-                    "Apple Mail running — search/draft live gated; send remains approval-gated".into()
+                    "Apple Mail running — search/draft live gated; send remains approval-gated"
+                        .into()
                 } else {
                     "Apple Mail not running — stub remains default".into()
                 },

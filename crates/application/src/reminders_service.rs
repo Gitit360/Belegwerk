@@ -211,7 +211,9 @@ impl ReminderService {
         drop(stmt);
         drop(conn);
         for (eco_id, desc) in pending {
-            let eco = uuid::Uuid::parse_str(&eco_id).ok().map(EconomicTransactionId);
+            let eco = uuid::Uuid::parse_str(&eco_id)
+                .ok()
+                .map(EconomicTransactionId);
             let note = format!("Fehlender Beleg zu Transaktion: {desc}");
             let case = self.open_case(note, eco)?;
             let _ = self.attach_placeholder(case.id, "DocumentPlaceholder: ausstehend");

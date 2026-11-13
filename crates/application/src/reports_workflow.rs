@@ -67,8 +67,7 @@ fn allocation_lines(conn: &Connection) -> Result<Vec<ReportLine>, ReportsError> 
         .map_err(|e| ReportsError::Storage(e.to_string()))?;
     let mut out = Vec::new();
     for row in rows {
-        let (id, amount, currency, eco) =
-            row.map_err(|e| ReportsError::Storage(e.to_string()))?;
+        let (id, amount, currency, eco) = row.map_err(|e| ReportsError::Storage(e.to_string()))?;
         out.push(ReportLine {
             label: format!("Zuordnung {id}"),
             amount_minor: -amount.abs(),
@@ -98,8 +97,7 @@ fn journal_lines(conn: &Connection) -> Result<Vec<ReportLine>, ReportsError> {
         .map_err(|e| ReportsError::Storage(e.to_string()))?;
     let mut out = Vec::new();
     for row in rows {
-        let (id, desc, status, blocked) =
-            row.map_err(|e| ReportsError::Storage(e.to_string()))?;
+        let (id, desc, status, blocked) = row.map_err(|e| ReportsError::Storage(e.to_string()))?;
         let sum: i64 = conn
             .query_row(
                 "SELECT COALESCE(SUM(debit_minor),0) FROM journal_lines WHERE journal_entry_id = ?1",
