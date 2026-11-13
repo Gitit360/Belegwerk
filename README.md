@@ -9,18 +9,25 @@ Dieses Repository startet mit Spezifikation (M00) und einem lauffähigen Gerüst
 
 ## Voraussetzungen (macOS)
 
+- **Apple Silicon (arm64)** — natives Build-Ziel; kein Rosetta-/x86_64-Rust
 - macOS 12+
-- Xcode CLT
+- Xcode CLT (arm64)
 - Node 20+ und [pnpm](https://pnpm.io) 10+
-- Rust stable (`rustup`)
+- Rust stable via `rustup` mit Host `aarch64-apple-darwin` (Tauri 2)
 - Systemabhängigkeiten für [Tauri 2](https://v2.tauri.app/start/prerequisites/)
 
 ```bash
+# Einmalig, falls rustc noch x86_64/Rosetta ist:
+rustup set default-host aarch64-apple-darwin
+rustup toolchain install stable -c rustfmt -c clippy
+# Prüfen: rustc -vV  →  host: aarch64-apple-darwin
+
 pnpm install
-pnpm check:rust          # fmt + clippy + tests (Crates)
+pnpm check:silicon       # arm64 + natives rustc
+pnpm check:rust          # Silicon-Check + fmt + clippy + tests
 pnpm typecheck           # TypeScript packages / app
 pnpm --filter @belegwerk/desktop dev   # Vite UI only
-pnpm tauri:dev           # Full desktop window (macOS)
+pnpm tauri:dev           # Full desktop window (macOS, aarch64)
 ```
 
 ## Linux / Cloud-CI Hinweis

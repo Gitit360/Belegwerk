@@ -65,10 +65,10 @@ impl JournalStore<'_> {
             return Ok(());
         }
         let reviewed = TaxRulePackRef {
-            id: "core".into(),
-            version: "0.0.0-test".into(),
+            id: "belegwerk-core".into(),
+            version: "2026.1.0".into(),
             status: "reviewed".into(),
-            source_note: Some("synthetic test pack — not tax advice".into()),
+            source_note: Some("docs/accounting/TAX_RULE_REGISTER_v2026.md".into()),
         };
         let ok = crate::journal::draft_expense_against_bank(
             "j-synth-ok",

@@ -174,7 +174,7 @@ export const browserApi = {
     };
   },
 
-  async matchingConfirm(transactionId: string, documentId: string) {
+  async matchingConfirm(transactionId: string, documentId: string, privatePercent = 0) {
     const s = store();
     const tx = MATCHING_WORKBENCH.transactions.find((t) => t.id === transactionId);
     if (!tx) throw new Error("unbekannte Transaktion");
@@ -193,7 +193,143 @@ export const browserApi = {
       createdAt: new Date().toISOString(),
     };
     s.allocations.push(alloc);
+    const privateMinor = Math.floor((rem * privatePercent) / 100);
+    const businessMinor = rem - privateMinor;
+    const lines = [];
+    if (businessMinor > 0) {
+      lines.push({
+        account_code: "4950",
+        debit_minor: businessMinor,
+        credit_minor: 0,
+        currency: tx.currency,
+      });
+    }
+    if (privateMinor > 0) {
+      lines.push({
+        account_code: "1800",
+        debit_minor: privateMinor,
+        credit_minor: 0,
+        currency: tx.currency,
+      });
+    }
+    lines.push({
+      account_code: "1200",
+      debit_minor: 0,
+      credit_minor: rem,
+      currency: tx.currency,
+    });
+    s.journals.unshift({
+      id: `j-match-${alloc.id}`,
+      status: "draft",
+      description: `expense draft private_share=${privatePercent}% (TAX-PRIVATE-SHARE)`,
+      blockedUnsupported: false,
+      rulePackId: "belegwerk-core",
+      rulePackVersion: "2026.1.0",
+      rulePackStatus: "reviewed",
+      lines,
+    });
     return alloc;
+  },
+
+  async matchingRebuild() {
+    return 0;
+  },
+
+  async accountsSnapshot() {
+    return {
+      note: "Browser-Fallback — Tauri replay für SQLite",
+      accounts: [
+        {
+          id: "synth-gls-main",
+          provider: "moneymoney",
+          label: "synth-gls-main",
+          currency: "EUR",
+          transactionCount: 1,
+        },
+      ],
+      recent: [
+        {
+          id: "browser-mm-1",
+          sourceRef: "mm-synth-001",
+          bookingDate: "2026-01-15",
+          amountMinor: -2499,
+          currency: "EUR",
+          counterparty: "Synthetic Cloud Tools LLC",
+          purpose: "INV-SYNTH-1001 SaaS",
+          economicTransactionId: "eco-synth-001",
+        },
+      ],
+    };
+  },
+
+  async accountsReplayFixtures() {
+    return 1;
+  },
+
+  async accountsLiveMoneymoney() {
+    throw new Error("MoneyMoney Live nur in Tauri mit BELEGWERK_LIVE_CONNECTORS=1");
+  },
+
+  async mailLiveSearch(_subjectContains: string) {
+    void _subjectContains;
+    throw new Error("Apple Mail Live nur in Tauri mit BELEGWERK_LIVE_CONNECTORS=1");
+  },
+
+  async keychainEnsureSlot() {
+    throw new Error("Keychain-Slot nur in Tauri mit BELEGWERK_LIVE_CONNECTORS=1");
+  },
+
+  async reportsSnapshot() {
+    const s = store();
+    return {
+      id: "cash-browser",
+      title: "Cash / Zuordnungen (Browser)",
+      basis: "management",
+      lines: s.allocations.map((a) => ({
+        label: `Zuordnung ${a.id}`,
+        amount_minor: -Math.abs(a.allocatedMinor),
+        currency: a.currency,
+        source_ref: a.economicTransactionId,
+      })),
+      note: "Browser-Fallback",
+    };
+  },
+
+  async archiveSnapshot(query?: string) {
+    const docs = store().documents.map((d) => ({
+      id: d.id,
+      contentHash: d.contentHash,
+      filename: d.originalFilename,
+      mimeType: d.mimeType,
+      byteSize: d.byteSize,
+      importedAt: d.importedAt,
+      batchId: d.importBatchId,
+    }));
+    const hits = query
+      ? docs
+          .filter((d) => JSON.stringify(d).toLowerCase().includes(query.toLowerCase()))
+          .map((d) => d.contentHash)
+      : [];
+    return { note: "Browser-Archiv", documents: docs, hits };
+  },
+
+  async importPreviewBlob(contentHash: string) {
+    const d = store().documents.find((x) => x.contentHash === contentHash);
+    return d?.text ?? "";
+  },
+
+  async macosProbes() {
+    return {
+      platform: "browser",
+      liveEnabled: false,
+      probes: [
+        {
+          id: "tauri_gui",
+          available: false,
+          detail: "Vite-Fallback — macOS-Probes nur in Tauri",
+        },
+      ],
+    };
   },
 
   async matchingReject(transactionId: string, documentId: string) {

@@ -1,19 +1,16 @@
 import { useEffect, useState } from "react";
 import { api } from "./api/client";
-import {
-  AccountsPage,
-  ArchivePage,
-  AutomationsPage,
-  PlaceholderModulePage,
-  ReportsPage,
-} from "./FixturePages";
+import { AutomationsPage, PlaceholderModulePage } from "./FixturePages";
 import { MatchingWorkbench } from "./MatchingWorkbench";
 import { NAV_ITEMS, PLACEHOLDER_COPY, type NavId } from "./nav";
 import { ErrorState, LoadingState, fixtureStateCss } from "./uiStates";
 import {
   AccountingWorkflowPage,
+  AccountsWorkflowPage,
+  ArchiveWorkflowPage,
   InboxPage,
   MissingWorkflowPage,
+  ReportsWorkflowPage,
   SettingsWorkflowPage,
 } from "./workflowPages";
 
@@ -142,17 +139,17 @@ function ModulePanel({ id }: { id: NavId }) {
     case "inbox":
       return <InboxPage />;
     case "accounts":
-      return <AccountsPage />;
+      return <AccountsWorkflowPage />;
     case "matching":
       return <MatchingWorkbench />;
     case "missing":
       return <MissingWorkflowPage />;
     case "archive":
-      return <ArchivePage />;
+      return <ArchiveWorkflowPage />;
     case "accounting":
       return <AccountingWorkflowPage />;
     case "reports":
-      return <ReportsPage />;
+      return <ReportsWorkflowPage />;
     case "automations":
       return <AutomationsPage />;
     case "settings":
@@ -171,22 +168,22 @@ const shellCss = `
 .bw-nav {
   padding: var(--bw-space-6) var(--bw-space-4);
   border-right: 1px solid var(--bw-color-border-subtle);
-  background: color-mix(in srgb, var(--bw-color-surface-elevated) 88%, transparent);
-  backdrop-filter: blur(10px);
+  background: var(--color-shell);
 }
 .bw-brand-eyebrow {
   margin: 0;
   font-size: 0.75rem;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
   color: var(--bw-color-text-secondary);
 }
 .bw-brand-name {
   margin: var(--bw-space-1) 0 var(--bw-space-6);
   font-family: var(--bw-font-display);
-  font-weight: 700;
-  font-size: 1.85rem;
+  font-weight: 600;
+  font-size: 1.35rem;
   letter-spacing: -0.02em;
+  color: var(--bw-color-text-primary);
 }
 .bw-nav ul {
   list-style: none;
@@ -206,13 +203,14 @@ const shellCss = `
   cursor: pointer;
 }
 .bw-nav-item:hover {
-  background: var(--bw-color-surface-muted);
+  background: color-mix(in srgb, var(--color-surface-bright) 55%, transparent);
   color: var(--bw-color-text-primary);
 }
 .bw-nav-item.is-active {
   background: var(--bw-color-surface-selected);
   color: var(--bw-color-text-primary);
   font-weight: 600;
+  box-shadow: inset 3px 0 0 var(--color-accent);
 }
 .bw-main {
   padding: var(--bw-space-8);
@@ -224,7 +222,9 @@ const shellCss = `
 .bw-main-header h2 {
   margin: 0 0 var(--bw-space-2);
   font-family: var(--bw-font-display);
-  font-size: 2rem;
+  font-size: 1.75rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
 }
 .bw-lede {
   margin: 0;
@@ -234,7 +234,7 @@ const shellCss = `
 .bw-panel {
   margin-top: var(--bw-space-6);
   padding: var(--bw-space-6);
-  background: var(--bw-color-surface-elevated);
+  background: var(--color-surface-raised);
   border: 1px solid var(--bw-color-border-subtle);
   border-radius: var(--bw-radius-md);
   line-height: 1.55;
@@ -259,7 +259,7 @@ const shellCss = `
   padding: var(--bw-space-3);
   border: 1px solid var(--bw-color-border-subtle);
   border-radius: var(--bw-radius-sm);
-  background: var(--bw-color-surface-muted);
+  background: var(--color-surface-bright);
 }
 .bw-subhead {
   margin: var(--bw-space-4) 0 var(--bw-space-2);

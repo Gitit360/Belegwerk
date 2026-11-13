@@ -169,6 +169,7 @@ impl ReminderService {
     }
 
     pub fn seed_demo_if_empty(&self) -> Result<(), ReminderError> {
+        self.sync_unmatched_cases()?;
         let conn = self.conn()?;
         let n: i64 = conn
             .query_row("SELECT COUNT(*) FROM missing_document_cases", [], |r| {
@@ -182,6 +183,41 @@ impl ReminderService {
         let case = self.open_case("Beleg zu mm-synth-001 fehlt (synthetisch)", None)?;
         self.attach_placeholder(case.id, "DocumentPlaceholder: Vendor PDF ausstehend")?;
         Ok(())
+    }
+
+    /// Open a missing-doc case for economic txs without payment_allocations.
+    pub fn sync_unmatched_cases(&self) -> Result<usize, ReminderError> {
+        let conn = self.conn()?;
+        let mut stmt = conn
+            .prepare(
+                "SELECT e.id, COALESCE(e.description, e.id) FROM economic_transactions e
+                 WHERE NOT EXISTS (
+                   SELECT 1 FROM payment_allocations p WHERE p.economic_transaction_id = e.id
+                 )
+                 AND NOT EXISTS (
+                   SELECT 1 FROM missing_document_cases c
+                   WHERE c.economic_transaction_id = e.id AND c.status != 'resolved' AND c.status != 'dismissed'
+                 )",
+            )
+            .map_err(|e| ReminderError::Storage(e.to_string()))?;
+        let rows = stmt
+            .query_map([], |r| Ok((r.get::<_, String>(0)?, r.get::<_, String>(1)?)))
+            .map_err(|e| ReminderError::Storage(e.to_string()))?;
+        let mut created = 0usize;
+        let mut pending = Vec::new();
+        for row in rows {
+            pending.push(row.map_err(|e| ReminderError::Storage(e.to_string()))?);
+        }
+        drop(stmt);
+        drop(conn);
+        for (eco_id, desc) in pending {
+            let eco = uuid::Uuid::parse_str(&eco_id).ok().map(EconomicTransactionId);
+            let note = format!("Fehlender Beleg zu Transaktion: {desc}");
+            let case = self.open_case(note, eco)?;
+            let _ = self.attach_placeholder(case.id, "DocumentPlaceholder: ausstehend");
+            created += 1;
+        }
+        Ok(created)
     }
 }
 

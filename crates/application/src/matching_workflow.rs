@@ -158,6 +158,22 @@ impl MatchingWorkflow<'_> {
         document_id: &str,
         allocated_minor: Option<i64>,
     ) -> Result<PaymentAllocation, MatchWorkflowError> {
+        self.confirm_with_private_share(
+            economic_transaction_id,
+            document_id,
+            allocated_minor,
+            0,
+        )
+    }
+
+    /// Confirm allocation and create a journal draft (TAX-UST-RATE-19 / TAX-PRIVATE-SHARE).
+    pub fn confirm_with_private_share(
+        &self,
+        economic_transaction_id: &str,
+        document_id: &str,
+        allocated_minor: Option<i64>,
+        private_percent: u8,
+    ) -> Result<PaymentAllocation, MatchWorkflowError> {
         self.authorize(
             KnownAction::MatchConfirm,
             &format!("confirm:{economic_transaction_id}:{document_id}"),
@@ -226,7 +242,40 @@ impl MatchingWorkflow<'_> {
             ),
         )
         .map_err(|e| MatchWorkflowError::Storage(e.to_string()))?;
+
+        // Journal draft from allocation — uses reviewed rule pack; private share optional.
+        let pack = belegwerk_domain::TaxRulePack::load_embedded_2026()
+            .map_err(|e| MatchWorkflowError::Invalid(e.to_string()))?;
+        let _ = pack.assert_postable_rule("TAX-PRIVATE-SHARE");
+        let draft_id = format!("j-match-{}", payment.id);
+        let draft = crate::journal::draft_expense_with_private_share(
+            &draft_id,
+            "4950",
+            "1200",
+            payment.allocated_minor,
+            &payment.currency,
+            private_percent,
+            pack.as_ref_for_journal(),
+        )
+        .map_err(|e| MatchWorkflowError::Invalid(e.to_string()))?;
+        let jstore = crate::journal_store::JournalStore {
+            gate: self.gate,
+            paths: self.paths.clone(),
+            caller: self.caller.clone(),
+        };
+        jstore
+            .save_draft(&draft)
+            .map_err(|e| MatchWorkflowError::Storage(e.to_string()))?;
+
         Ok(payment)
+    }
+
+    pub fn rebuild_suggestions(&self) -> Result<usize, MatchWorkflowError> {
+        let svc = crate::match_rebuild::MatchRebuildService {
+            paths: self.paths.clone(),
+        };
+        svc.rebuild_all()
+            .map_err(|e| MatchWorkflowError::Storage(e.to_string()))
     }
 
     pub fn reject(

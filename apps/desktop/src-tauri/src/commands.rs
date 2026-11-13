@@ -1,13 +1,17 @@
 //! Typed invoke commands for core workflows (browser fallbacks live in the React shell).
 
+use belegwerk_application::accounts_workflow::AccountsWorkflow;
 use belegwerk_application::approval::ApprovalService;
+use belegwerk_application::archive_workflow::ArchiveWorkflow;
 use belegwerk_application::audit::InMemoryAuditSink;
 use belegwerk_application::import_pipeline::{ImportFile, ImportPipeline};
 use belegwerk_application::import_query::ImportQuery;
 use belegwerk_application::journal_store::JournalStore;
+use belegwerk_application::macos_probes;
 use belegwerk_application::matching_workflow::{BatchItem, MatchingWorkflow};
 use belegwerk_application::permission::PermissionGate;
 use belegwerk_application::reminders_service::ReminderService;
+use belegwerk_application::reports_workflow::ReportsWorkflow;
 use belegwerk_application::settings_service::SettingsService;
 use belegwerk_domain::settings::TaxProfileSettings;
 use belegwerk_infrastructure::{migrate, open_db, DataPaths};
@@ -63,6 +67,7 @@ pub struct MatchPairArgs {
     pub transaction_id: String,
     pub document_id: String,
     pub allocated_minor: Option<i64>,
+    pub private_percent: Option<u8>,
 }
 
 #[tauri::command]
@@ -76,10 +81,27 @@ pub fn matching_confirm(
         paths,
         caller: "desktop-ui".into(),
     };
+    let private = args.private_percent.unwrap_or(0);
     let pay = wf
-        .confirm(&args.transaction_id, &args.document_id, args.allocated_minor)
+        .confirm_with_private_share(
+            &args.transaction_id,
+            &args.document_id,
+            args.allocated_minor,
+            private,
+        )
         .map_err(|e| e.to_string())?;
     serde_json::to_value(pay).map_err(|e| e.to_string())
+}
+
+#[tauri::command]
+pub fn matching_rebuild(state: State<'_, AppState>) -> Result<usize, String> {
+    let paths = paths(&state)?;
+    let wf = MatchingWorkflow {
+        gate: &state.gate,
+        paths,
+        caller: "desktop-ui".into(),
+    };
+    wf.rebuild_suggestions().map_err(|e| e.to_string())
 }
 
 #[tauri::command]
@@ -128,10 +150,10 @@ pub fn import_synthetic_files(
     source_label: String,
     files: Vec<ImportFileArgs>,
 ) -> Result<serde_json::Value, String> {
-    let paths = paths(&state)?;
+    let data_paths = paths(&state)?;
     let pipeline = ImportPipeline {
         gate: &state.gate,
-        paths,
+        paths: data_paths,
         caller: "desktop-ui".into(),
     };
     let mapped: Vec<ImportFile> = files
@@ -145,11 +167,135 @@ pub fn import_synthetic_files(
     let out = pipeline
         .import_files(source_label, &mapped)
         .map_err(|e| e.to_string())?;
+    let data_paths = paths(&state)?;
+    let rebuilt = MatchingWorkflow {
+        gate: &state.gate,
+        paths: data_paths,
+        caller: "desktop-ui".into(),
+    }
+    .rebuild_suggestions()
+    .unwrap_or(0);
     Ok(serde_json::json!({
         "batchId": out.batch.id.to_string(),
         "documentCount": out.documents.len(),
         "hashes": out.documents.iter().map(|d| d.content_hash.as_str().to_string()).collect::<Vec<_>>(),
+        "matchCandidates": rebuilt,
     }))
+}
+
+#[tauri::command]
+pub fn import_preview_blob(
+    state: State<'_, AppState>,
+    content_hash: String,
+) -> Result<String, String> {
+    let arch = ArchiveWorkflow {
+        paths: paths(&state)?,
+    };
+    arch.preview_text(&content_hash).map_err(|e| e.to_string())
+}
+
+#[tauri::command]
+pub fn accounts_snapshot(state: State<'_, AppState>) -> Result<serde_json::Value, String> {
+    let wf = AccountsWorkflow {
+        gate: &state.gate,
+        paths: paths(&state)?,
+        caller: "desktop-ui".into(),
+    };
+    serde_json::to_value(wf.snapshot().map_err(|e| e.to_string())?).map_err(|e| e.to_string())
+}
+
+#[tauri::command]
+pub fn accounts_replay_fixtures(
+    state: State<'_, AppState>,
+    dir: Option<String>,
+) -> Result<usize, String> {
+    let wf = AccountsWorkflow {
+        gate: &state.gate,
+        paths: paths(&state)?,
+        caller: "desktop-ui".into(),
+    };
+    let n = if let Some(d) = dir {
+        wf.replay_bank_fixtures(std::path::Path::new(&d))
+            .map_err(|e| e.to_string())?
+    } else {
+        wf.replay_default_synthetic_bank()
+            .map_err(|e| e.to_string())?
+    };
+    let _ = MatchingWorkflow {
+        gate: &state.gate,
+        paths: paths(&state)?,
+        caller: "desktop-ui".into(),
+    }
+    .rebuild_suggestions();
+    Ok(n)
+}
+
+#[tauri::command]
+pub fn accounts_live_moneymoney(
+    state: State<'_, AppState>,
+    from_date: Option<String>,
+) -> Result<usize, String> {
+    let wf = AccountsWorkflow {
+        gate: &state.gate,
+        paths: paths(&state)?,
+        caller: "desktop-ui".into(),
+    };
+    let n = wf
+        .import_live_moneymoney(from_date.as_deref())
+        .map_err(|e| e.to_string())?;
+    let _ = MatchingWorkflow {
+        gate: &state.gate,
+        paths: paths(&state)?,
+        caller: "desktop-ui".into(),
+    }
+    .rebuild_suggestions();
+    Ok(n)
+}
+
+#[tauri::command]
+pub fn mail_live_search(
+    subject_contains: String,
+    limit: Option<usize>,
+) -> Result<serde_json::Value, String> {
+    let hits = belegwerk_application::mail_live::search_inbox_subject(
+        &subject_contains,
+        limit.unwrap_or(20),
+    )
+    .map_err(|e| e.to_string())?;
+    serde_json::to_value(hits).map_err(|e| e.to_string())
+}
+
+#[tauri::command]
+pub fn keychain_ensure_slot() -> Result<String, String> {
+    belegwerk_application::mail_live::ensure_keychain_slot().map_err(|e| e.to_string())
+}
+
+#[tauri::command]
+pub fn reports_snapshot(state: State<'_, AppState>) -> Result<serde_json::Value, String> {
+    let wf = ReportsWorkflow {
+        paths: paths(&state)?,
+    };
+    serde_json::to_value(wf.snapshot().map_err(|e| e.to_string())?).map_err(|e| e.to_string())
+}
+
+#[tauri::command]
+pub fn archive_snapshot(
+    state: State<'_, AppState>,
+    query: Option<String>,
+) -> Result<serde_json::Value, String> {
+    let wf = ArchiveWorkflow {
+        paths: paths(&state)?,
+    };
+    serde_json::to_value(
+        wf.snapshot(query.as_deref())
+            .map_err(|e| e.to_string())?,
+    )
+    .map_err(|e| e.to_string())
+}
+
+#[tauri::command]
+pub fn macos_capability_probes() -> serde_json::Value {
+    serde_json::to_value(macos_probes::run_probes()).unwrap_or_else(|_| serde_json::json!({}))
 }
 
 #[tauri::command]

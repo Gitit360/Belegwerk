@@ -16,6 +16,7 @@ chrono = { workspace = true }
 sha2 = { workspace = true }
 hex = { workspace = true }
 rusqlite = { workspace = true }
+plist = "1"
 
 [dev-dependencies]
 belegwerk-plugin-host = { path = "../plugin-host" }

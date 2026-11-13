@@ -38,13 +38,16 @@ Merge-Reihenfolge wenn freigegeben: **#1 → #2 → #4 → #5** (Stack).
 | M15 | deepened | Extension hook registry (all disabled) |
 | Settings | workflow | TaxProfile (Ist/monatlich, Dauerfrist aus) in SQLite |
 
-## Core workflows (#5)
+## Core workflows (#5+)
 
-- Matching E2E + batch toolbar
-- Eingang drop-zone → ImportPipeline
+- Matching E2E + batch toolbar + rebuild + Privatanteil (TAX-PRIVATE-SHARE)
+- Eingang drop-zone → ImportPipeline → match rebuild
+- Konten: Bank-Fixture-Replay → economic_transactions
 - Fehlende Belege escalate/complete
-- Buchhaltung drafts + blocked reasons
-- Einstellungen TaxProfile
+- Buchhaltung drafts aus Match + blocked EU-B2B
+- Berichte/Archiv aus SQLite
+- Einstellungen TaxProfile + macOS Capability-Probes
+- Regelregister `docs/accounting/` + `crates/domain/rules/tax_profile_2026.json`
 - Tauri invoke + browser fallbacks
 
 ## Policy
@@ -56,6 +59,19 @@ Keine Bankzahlungen · synthetische Fixtures only · keine erfundenen Steuerrege
 | Real / getestet in CI/Linux | Fake / Stub / macOS-only |
 |---|---|
 | Gate, Import, Match allocations, Journal store, Settings, Reminder complete, Vite UI | Tauri native window (commands wired), MoneyMoney AppleScript, Keychain, Apple Mail, GrandTotal live, ERiC |
+
+## Toolchain (Apple Silicon)
+
+- Host-Ziel: **aarch64-apple-darwin** (kein Rosetta/x86_64-Rust)
+- Check: `pnpm check:silicon` · `scripts/ensure-apple-silicon.sh`
+- `rust-toolchain.toml` → `stable` (arm64); Workspace + Tauri nativ
+
+## Live-Connector (macOS)
+
+- Flag: `BELEGWERK_LIVE_CONNECTORS=1`
+- MoneyMoney: `export transactions … as "plist"` (read-only) → Konten → **MoneyMoney Live**
+- Mail: Inbox-Suche (read-only) · Keychain-Slot-Marker
+- Default ohne Flag: Fixture-Replay
 
 ## macOS-only gaps
 

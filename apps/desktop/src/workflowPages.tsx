@@ -21,17 +21,25 @@ const pageCss = `
 }
 .bw-btn {
   border: 1px solid var(--bw-color-border-subtle);
-  background: var(--bw-color-surface-elevated);
+  background: var(--color-surface-bright);
   color: var(--bw-color-text-primary);
-  border-radius: var(--bw-radius-sm);
+  border-radius: var(--bw-radius-pill);
   padding: var(--bw-space-2) var(--bw-space-3);
   cursor: pointer;
+  font-weight: 500;
 }
 .bw-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+.bw-btn:hover:not(:disabled) {
+  background: var(--color-surface-raised);
+}
 .bw-btn-accent {
   background: var(--bw-color-accent);
   border-color: var(--bw-color-accent);
-  color: var(--bw-color-text-inverse);
+  color: var(--bw-color-on-accent);
+}
+.bw-btn-accent:hover:not(:disabled) {
+  background: var(--bw-color-accent-hover);
+  border-color: var(--bw-color-accent-hover);
 }
 .bw-actions { display: flex; flex-wrap: wrap; gap: var(--bw-space-2); margin-top: var(--bw-space-3); }
 .bw-form { display: grid; gap: var(--bw-space-3); margin-top: var(--bw-space-3); max-width: 28rem; }
@@ -41,7 +49,7 @@ const pageCss = `
   padding: var(--bw-space-2);
   border-radius: var(--bw-radius-sm);
   border: 1px solid var(--bw-color-border-subtle);
-  background: var(--bw-color-surface-elevated);
+  background: var(--color-surface-bright);
   color: var(--bw-color-text-primary);
 }
 .bw-viewer {
@@ -49,7 +57,7 @@ const pageCss = `
   padding: var(--bw-space-4);
   border: 1px solid var(--bw-color-border-subtle);
   border-radius: var(--bw-radius-md);
-  background: var(--bw-color-surface-muted);
+  background: var(--color-surface-bright);
 }
 .bw-viewer pre {
   white-space: pre-wrap;
@@ -595,8 +603,337 @@ export function SettingsWorkflowPage() {
           Speichern
         </button>
       </div>
+      <MacosProbesPanel />
       <style>{pageCss}</style>
       <style>{fixtureStateCss}</style>
+    </div>
+  );
+}
+
+export function AccountsWorkflowPage() {
+  const [snap, setSnap] = useState<{
+    note?: string;
+    accounts?: Array<{
+      id: string;
+      provider: string;
+      label: string;
+      currency: string;
+      transactionCount?: number;
+      transaction_count?: number;
+    }>;
+    recent?: Array<{
+      sourceRef?: string;
+      source_ref?: string;
+      bookingDate?: string;
+      booking_date?: string;
+      amountMinor?: number;
+      amount_minor?: number;
+      counterparty?: string;
+      purpose?: string;
+    }>;
+  } | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [busy, setBusy] = useState(false);
+
+  const reload = useCallback(async () => {
+    setError(null);
+    try {
+      setSnap((await api.accountsSnapshot()) as typeof snap);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Konten nicht ladbar");
+    }
+  }, []);
+
+  useEffect(() => {
+    void reload();
+  }, [reload]);
+
+  const [liveInfo, setLiveInfo] = useState<string | null>(null);
+
+  async function replay() {
+    setBusy(true);
+    setError(null);
+    setLiveInfo(null);
+    try {
+      await api.accountsReplayFixtures();
+      await reload();
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Fixture-Replay fehlgeschlagen");
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function liveMoneyMoney() {
+    setBusy(true);
+    setError(null);
+    setLiveInfo(null);
+    try {
+      const n = await api.accountsLiveMoneymoney();
+      setLiveInfo(`MoneyMoney Live: ${n} Umsätze importiert (read-only)`);
+      await reload();
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "MoneyMoney Live fehlgeschlagen");
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  if (!snap && !error) {
+    return <LoadingState label="Konten werden geladen …" />;
+  }
+
+  return (
+    <div>
+      <p className="bw-fixture-note">{snap?.note ?? "Konten"}</p>
+      {error ? <ErrorState title="Konten" body={error} /> : null}
+      {liveInfo ? <p className="bw-list-meta">{liveInfo}</p> : null}
+      <div className="bw-actions">
+        <button type="button" className="bw-btn bw-btn-accent" disabled={busy} onClick={() => void replay()}>
+          Bank-Fixtures importieren
+        </button>
+        <button type="button" className="bw-btn" disabled={busy} onClick={() => void liveMoneyMoney()}>
+          MoneyMoney Live (30 Tage)
+        </button>
+        <button type="button" className="bw-btn" disabled={busy} onClick={() => void reload()}>
+          Aktualisieren
+        </button>
+      </div>
+      <ul className="bw-simple-list">
+        {(snap?.accounts ?? []).map((a) => (
+          <li key={a.id}>
+            <strong>{a.label}</strong>
+            <div className="bw-list-meta">
+              {a.provider} · {a.currency} · {a.transactionCount ?? a.transaction_count ?? 0}{" "}
+              Bewegungen · Read-only
+            </div>
+          </li>
+        ))}
+      </ul>
+      <h3 className="bw-subhead">Letzte Bewegungen</h3>
+      <ul className="bw-simple-list">
+        {(snap?.recent ?? []).map((t, i) => (
+          <li key={t.sourceRef ?? t.source_ref ?? i}>
+            {t.bookingDate ?? t.booking_date} ·{" "}
+            {((t.amountMinor ?? t.amount_minor ?? 0) / 100).toFixed(2)} EUR · {t.counterparty}
+            <div className="bw-list-meta">{t.purpose}</div>
+          </li>
+        ))}
+      </ul>
+      <style>{pageCss}</style>
+      <style>{fixtureStateCss}</style>
+    </div>
+  );
+}
+
+export function ArchiveWorkflowPage() {
+  const [query, setQuery] = useState("");
+  const [snap, setSnap] = useState<{
+    note?: string;
+    documents?: Array<{
+      id: string;
+      contentHash?: string;
+      content_hash?: string;
+      filename?: string;
+      byteSize?: number;
+      byte_size?: number;
+    }>;
+    hits?: string[];
+  } | null>(null);
+  const [preview, setPreview] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
+
+  const reload = useCallback(async () => {
+    setError(null);
+    try {
+      setSnap((await api.archiveSnapshot(query || undefined)) as typeof snap);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Archiv nicht ladbar");
+    }
+  }, [query]);
+
+  useEffect(() => {
+    void reload();
+  }, [reload]);
+
+  async function openPreview(hash: string) {
+    try {
+      setPreview(await api.importPreviewBlob(hash));
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Vorschau fehlgeschlagen");
+    }
+  }
+
+  return (
+    <div>
+      <p className="bw-fixture-note">{snap?.note ?? "Archiv"}</p>
+      {error ? <ErrorState title="Archiv" body={error} /> : null}
+      <div className="bw-form">
+        <label>
+          Suche
+          <input value={query} onChange={(e) => setQuery(e.target.value)} />
+        </label>
+        <button type="button" className="bw-btn" onClick={() => void reload()}>
+          Suchen
+        </button>
+      </div>
+      {(snap?.hits?.length ?? 0) > 0 ? (
+        <p className="bw-list-meta">Treffer: {snap!.hits!.join(", ")}</p>
+      ) : null}
+      <ul className="bw-simple-list">
+        {(snap?.documents ?? []).map((d) => {
+          const hash = d.contentHash ?? d.content_hash ?? "";
+          return (
+            <li key={d.id}>
+              <button type="button" className="bw-btn" onClick={() => void openPreview(hash)}>
+                {d.filename ?? d.id}
+              </button>
+              <div className="bw-list-meta">
+                {hash.slice(0, 12)}… · {d.byteSize ?? d.byte_size ?? 0} B
+              </div>
+            </li>
+          );
+        })}
+      </ul>
+      {preview ? (
+        <div className="bw-viewer">
+          <pre>{preview}</pre>
+        </div>
+      ) : null}
+      <style>{pageCss}</style>
+      <style>{fixtureStateCss}</style>
+    </div>
+  );
+}
+
+export function ReportsWorkflowPage() {
+  const [view, setView] = useState<{
+    title?: string;
+    note?: string;
+    lines?: Array<{
+      label: string;
+      amount_minor?: number;
+      amountMinor?: number;
+      currency?: string;
+      source_ref?: string;
+      sourceRef?: string;
+    }>;
+  } | null>(null);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    void (async () => {
+      try {
+        setView((await api.reportsSnapshot()) as typeof view);
+      } catch (e) {
+        setError(e instanceof Error ? e.message : "Berichte nicht ladbar");
+      }
+    })();
+  }, []);
+
+  if (!view && !error) return <LoadingState label="Berichte werden geladen …" />;
+
+  return (
+    <div>
+      <p className="bw-fixture-note">{view?.note ?? ""}</p>
+      {error ? <ErrorState title="Berichte" body={error} /> : null}
+      <h3 className="bw-subhead">{view?.title}</h3>
+      <ul className="bw-simple-list">
+        {(view?.lines ?? []).map((l, i) => (
+          <li key={i}>
+            {l.label}: {((l.amount_minor ?? l.amountMinor ?? 0) / 100).toFixed(2)}{" "}
+            {l.currency ?? "EUR"}
+            <div className="bw-list-meta">{l.source_ref ?? l.sourceRef}</div>
+          </li>
+        ))}
+      </ul>
+      <style>{pageCss}</style>
+      <style>{fixtureStateCss}</style>
+    </div>
+  );
+}
+
+function MacosProbesPanel() {
+  const [report, setReport] = useState<{
+    platform?: string;
+    liveEnabled?: boolean;
+    live_enabled?: boolean;
+    probes?: Array<{ id: string; available: boolean; detail: string }>;
+  } | null>(null);
+  const [liveMsg, setLiveMsg] = useState<string | null>(null);
+  const [busy, setBusy] = useState(false);
+
+  const reload = useCallback(() => {
+    void api.macosProbes().then((r) => setReport(r as typeof report));
+  }, []);
+
+  useEffect(() => {
+    reload();
+  }, [reload]);
+
+  const liveOn = !!(report?.liveEnabled || report?.live_enabled);
+
+  async function runKeychain() {
+    setBusy(true);
+    setLiveMsg(null);
+    try {
+      setLiveMsg(await api.keychainEnsureSlot());
+      reload();
+    } catch (e) {
+      setLiveMsg(e instanceof Error ? e.message : "Keychain fehlgeschlagen");
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function runMail() {
+    setBusy(true);
+    setLiveMsg(null);
+    try {
+      const hits = (await api.mailLiveSearch("Rechnung", 10)) as Array<{
+        subject?: string;
+        from?: string;
+      }>;
+      setLiveMsg(
+        hits.length
+          ? `Mail Live: ${hits.length} Treffer — „${hits[0]?.subject ?? ""}“`
+          : "Mail Live: 0 Treffer für „Rechnung“",
+      );
+    } catch (e) {
+      setLiveMsg(e instanceof Error ? e.message : "Mail-Suche fehlgeschlagen");
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  if (!report) return null;
+  return (
+    <div>
+      <h3 className="bw-subhead">macOS Capability-Probes</h3>
+      <p className="bw-list-meta">
+        Plattform: {report.platform} · Live:{" "}
+        {liveOn ? "an" : "aus"} (Env BELEGWERK_LIVE_CONNECTORS)
+      </p>
+      <ul className="bw-simple-list">
+        {(report.probes ?? []).map((p) => (
+          <li key={p.id}>
+            <strong>{p.id}</strong> — {p.available ? "verfügbar" : "nicht verfügbar"}
+            <div className="bw-list-meta">{p.detail}</div>
+          </li>
+        ))}
+      </ul>
+      <div className="bw-actions">
+        <button type="button" className="bw-btn" disabled={busy || !liveOn} onClick={() => void runKeychain()}>
+          Keychain-Slot prüfen
+        </button>
+        <button type="button" className="bw-btn" disabled={busy || !liveOn} onClick={() => void runMail()}>
+          Mail Live „Rechnung“
+        </button>
+        <button type="button" className="bw-btn" disabled={busy} onClick={reload}>
+          Probes aktualisieren
+        </button>
+      </div>
+      {liveMsg ? <p className="bw-list-meta">{liveMsg}</p> : null}
     </div>
   );
 }

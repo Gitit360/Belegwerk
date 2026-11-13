@@ -55,6 +55,7 @@ export function MatchingWorkbench() {
   const [selectedPairs, setSelectedPairs] = useState<Record<string, boolean>>({});
   const [preview, setPreview] = useState<Preview | null>(null);
   const [busy, setBusy] = useState(false);
+  const [privatePercent, setPrivatePercent] = useState(0);
 
   async function reload() {
     setLoading(true);
@@ -87,10 +88,26 @@ export function MatchingWorkbench() {
     if (!suggestion) return;
     setBusy(true);
     try {
-      await api.matchingConfirm(suggestion.transactionId, suggestion.documentId);
+      await api.matchingConfirm(
+        suggestion.transactionId,
+        suggestion.documentId,
+        privatePercent,
+      );
       await reload();
     } catch (e) {
       setError(e instanceof Error ? e.message : "Bestätigen fehlgeschlagen");
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function rebuild() {
+    setBusy(true);
+    try {
+      await api.matchingRebuild();
+      await reload();
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Vorschläge neu berechnen fehlgeschlagen");
     } finally {
       setBusy(false);
     }
@@ -138,7 +155,7 @@ export function MatchingWorkbench() {
     try {
       for (const it of items) {
         try {
-          await api.matchingConfirm(it.transactionId, it.documentId);
+          await api.matchingConfirm(it.transactionId, it.documentId, privatePercent);
         } catch {
           /* exceptions shown via preview */
         }
@@ -172,8 +189,14 @@ export function MatchingWorkbench() {
       <div className="bw-workbench">
         <EmptyState
           title="Keine Transaktionen"
-          body="Matching-Workbench ohne Daten — keine Live-Bankanbindung."
+          body="Zuerst unter Konten die Bank-Fixtures importieren, dann hier Vorschläge neu berechnen."
         />
+        <div className="bw-actions">
+          <button type="button" className="bw-btn bw-btn-accent" disabled={busy} onClick={() => void rebuild()}>
+            Vorschläge neu berechnen
+          </button>
+        </div>
+        <style>{workbenchCss}</style>
         <style>{fixtureStateCss}</style>
       </div>
     );
@@ -185,6 +208,24 @@ export function MatchingWorkbench() {
     <div className="bw-workbench" aria-label="Abgleich-Arbeitsansicht">
       <p className="bw-workbench-note">{snap.note}</p>
       {error ? <p className="bw-warn">{error}</p> : null}
+      <div className="bw-batch-bar">
+        <label className="bw-check">
+          Privatanteil %
+          <input
+            type="number"
+            min={0}
+            max={100}
+            value={privatePercent}
+            onChange={(e) =>
+              setPrivatePercent(Math.min(100, Math.max(0, Number(e.target.value) || 0)))
+            }
+            style={{ width: "4rem", marginLeft: "0.5rem" }}
+          />
+        </label>
+        <button type="button" className="bw-btn" disabled={busy} onClick={() => void rebuild()}>
+          Vorschläge neu berechnen
+        </button>
+      </div>
 
       <div className="bw-batch-bar" role="toolbar" aria-label="Stapelaktionen">
         <span className="bw-list-meta">{selCount} ausgewählt</span>
@@ -349,7 +390,7 @@ const workbenchCss = `
   align-items: center;
   margin-bottom: var(--bw-space-4);
   padding: var(--bw-space-3);
-  background: var(--bw-color-surface-muted);
+  background: var(--color-surface-bright);
   border: 1px solid var(--bw-color-border-subtle);
   border-radius: var(--bw-radius-sm);
 }
@@ -382,7 +423,7 @@ const workbenchCss = `
   width: 100%;
   text-align: left;
   border: 1px solid var(--bw-color-border-subtle);
-  background: var(--bw-color-surface-muted);
+  background: var(--color-surface-bright);
   border-radius: var(--bw-radius-sm);
   padding: var(--bw-space-3);
   cursor: pointer;
@@ -392,6 +433,7 @@ const workbenchCss = `
 .bw-list-item.is-active {
   border-color: var(--bw-color-accent);
   background: var(--bw-color-surface-selected);
+  box-shadow: inset 3px 0 0 var(--color-accent);
 }
 .bw-list-title { font-weight: 600; }
 .bw-list-meta { color: var(--bw-color-text-secondary); font-size: 0.85rem; }
@@ -399,7 +441,7 @@ const workbenchCss = `
   white-space: pre-wrap;
   font-family: var(--bw-font-mono);
   font-size: 0.8rem;
-  background: var(--bw-color-surface-muted);
+  background: var(--color-surface-bright);
   padding: var(--bw-space-3);
   border-radius: var(--bw-radius-sm);
 }
@@ -421,17 +463,25 @@ const workbenchCss = `
 }
 .bw-btn {
   border: 1px solid var(--bw-color-border-subtle);
-  background: var(--bw-color-surface-elevated);
+  background: var(--color-surface-bright);
   color: var(--bw-color-text-primary);
-  border-radius: var(--bw-radius-sm);
+  border-radius: var(--bw-radius-pill);
   padding: var(--bw-space-2) var(--bw-space-3);
   cursor: pointer;
+  font-weight: 500;
 }
 .bw-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+.bw-btn:hover:not(:disabled) {
+  background: var(--color-surface-raised);
+}
 .bw-btn-accent {
   background: var(--bw-color-accent);
   border-color: var(--bw-color-accent);
-  color: var(--bw-color-text-inverse);
+  color: var(--bw-color-on-accent);
+}
+.bw-btn-accent:hover:not(:disabled) {
+  background: var(--bw-color-accent-hover);
+  border-color: var(--bw-color-accent-hover);
 }
 @media (max-width: 960px) {
   .bw-workbench-grid { grid-template-columns: 1fr; }

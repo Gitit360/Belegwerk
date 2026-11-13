@@ -1,0 +1,49 @@
+{
+  "id": "belegwerk-core",
+  "version": "2026.1.0",
+  "status": "reviewed",
+  "validFrom": "2026-01-01",
+  "validTo": null,
+  "sourceDoc": "docs/accounting/TAX_RULE_REGISTER_v2026.md",
+  "rates": {
+    "standard_19": { "ruleId": "TAX-UST-RATE-19", "percent": 19, "encode": "default_after_confirm" },
+    "reduced_7": { "ruleId": "TAX-UST-RATE-7", "percent": 7, "encode": "suggest_only" }
+  },
+  "thresholds": {
+    "voranmeldungMonthlyAboveMinor": 900000,
+    "voranmeldungExemptAtOrBelowMinor": 200000,
+    "gwgImmediateMaxNetMinor": 80000,
+    "sammelpostenMinNetMinor": 25001,
+    "sammelpostenMaxNetMinor": 100000,
+    "kleinunternehmerPriorYearMaxMinor": 2500000,
+    "kleinunternehmerCurrentYearMaxMinor": 10000000,
+    "istUmsatzMaxPriorYearMinor": 80000000
+  },
+  "defaults": {
+    "vatMethod": "ist",
+    "reportingCadence": "monthly",
+    "dauerfristExtension": false,
+    "requireUserConfirmIst": true
+  },
+  "rules": [
+    { "id": "TAX-UST-RATE-19", "encode": "default_after_confirm", "confidence": "high" },
+    { "id": "TAX-UST-RATE-7", "encode": "suggest_only", "confidence": "high" },
+    { "id": "TAX-IST-20", "encode": "default_after_confirm", "confidence": "high" },
+    { "id": "TAX-EUR-11", "encode": "default_after_confirm", "confidence": "high" },
+    { "id": "TAX-VA-THRESH-2025", "encode": "default_after_confirm", "confidence": "high" },
+    { "id": "TAX-DFV", "encode": "default_after_confirm", "confidence": "high" },
+    { "id": "TAX-GWG-800", "encode": "default_after_confirm", "confidence": "high" },
+    { "id": "TAX-PRIVATE-SHARE", "encode": "default_after_confirm", "confidence": "high" },
+    { "id": "TAX-KU-2025", "encode": "suggest_only", "confidence": "medium" },
+    { "id": "TAX-RC-13B", "encode": "suggest_only", "confidence": "medium" },
+    { "id": "TAX-PC-1Y", "encode": "suggest_only", "confidence": "medium" },
+    { "id": "TAX-NEW-MONTHLY", "encode": "suggest_only", "confidence": "medium" },
+    { "id": "TAX-BLOCK-EU-B2B", "encode": "blocked", "confidence": "high" },
+    { "id": "TAX-BLOCK-REDUCED-UNCONFIRMED", "encode": "blocked", "confidence": "high" },
+    { "id": "TAX-BLOCK-VAT-FROM-OCR", "encode": "blocked", "confidence": "high" },
+    { "id": "TAX-BLOCK-GASTRO-2026", "encode": "blocked", "confidence": "medium" },
+    { "id": "TAX-BLOCK-ERIC", "encode": "blocked", "confidence": "high" },
+    { "id": "TAX-BLOCK-ELSTER-FIELDS", "encode": "blocked", "confidence": "high" },
+    { "id": "TAX-BLOCK-SKR03-KEYS", "encode": "blocked", "confidence": "high" }
+  ]
+}

@@ -76,7 +76,7 @@ export const fixtureStateCss = `
   padding: var(--bw-space-6);
   border-radius: var(--bw-radius-md);
   border: 1px dashed var(--bw-color-border-subtle);
-  background: var(--bw-color-surface-muted);
+  background: var(--color-surface-bright);
   display: grid;
   gap: var(--bw-space-2);
   justify-items: start;
@@ -94,32 +94,31 @@ export const fixtureStateCss = `
 }
 .bw-state-loading {
   border-style: solid;
-  border-color: color-mix(in srgb, var(--bw-color-status-info) 35%, var(--bw-color-border-subtle));
+  border-color: color-mix(in srgb, var(--color-accent) 45%, var(--bw-color-border-subtle));
 }
 .bw-state-empty {
   border-color: color-mix(in srgb, var(--bw-color-text-secondary) 25%, var(--bw-color-border-subtle));
 }
 .bw-state-error {
   border-style: solid;
-  border-color: color-mix(in srgb, var(--bw-color-status-danger) 45%, var(--bw-color-border-subtle));
-  background: color-mix(in srgb, var(--bw-color-status-danger) 8%, var(--bw-color-surface-elevated));
+  border-color: var(--color-message-error-border);
+  background: color-mix(in srgb, var(--color-message-error-bg) 12%, var(--color-surface-raised));
 }
 .bw-state-error .bw-state-title {
-  color: var(--bw-color-status-danger);
+  color: var(--color-message-error-bg);
 }
 .bw-state-pulse {
   width: 0.65rem;
   height: 0.65rem;
-  border-radius: 999px;
-  background: var(--bw-color-status-info);
+  border-radius: var(--bw-radius-pill);
+  background: var(--color-accent);
 }
 @media (prefers-reduced-motion: no-preference) {
-  .bw-state-pulse {
-    animation: bw-pulse var(--bw-motion-duration-medium) var(--bw-motion-ease) infinite alternate;
+  .bw-state-loading {
+    animation: busy-pulse-soft 1.6s ease-in-out infinite;
   }
-}
-@keyframes bw-pulse {
-  from { opacity: 0.35; transform: scale(0.9); }
-  to { opacity: 1; transform: scale(1); }
+  .bw-state-pulse {
+    animation: busy-pulse 1.5s ease-in-out infinite;
+  }
 }
 `;

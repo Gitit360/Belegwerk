@@ -32,13 +32,19 @@ export const api = {
       () => browserApi.matchingSnapshot(),
     ),
 
-  matchingConfirm: (transactionId: string, documentId: string) =>
+  matchingConfirm: (transactionId: string, documentId: string, privatePercent = 0) =>
     withFallback(
       () =>
         invoke("matching_confirm", {
-          args: { transactionId, documentId },
+          args: { transactionId, documentId, privatePercent },
         }),
-      () => browserApi.matchingConfirm(transactionId, documentId),
+      () => browserApi.matchingConfirm(transactionId, documentId, privatePercent),
+    ),
+
+  matchingRebuild: () =>
+    withFallback(
+      () => invoke<number>("matching_rebuild"),
+      () => browserApi.matchingRebuild(),
     ),
 
   matchingReject: (transactionId: string, documentId: string) =>
@@ -152,6 +158,67 @@ export const api = {
         };
       },
       () => browserApi.settingsSave(profile),
+    ),
+
+  accountsSnapshot: () =>
+    withFallback(
+      () => invoke("accounts_snapshot"),
+      () => browserApi.accountsSnapshot(),
+    ),
+
+  accountsReplayFixtures: (dir?: string) =>
+    withFallback(
+      () => invoke<number>("accounts_replay_fixtures", { dir: dir ?? null }),
+      () => browserApi.accountsReplayFixtures(),
+    ),
+
+  accountsLiveMoneymoney: (fromDate?: string) =>
+    withFallback(
+      () =>
+        invoke<number>("accounts_live_moneymoney", {
+          fromDate: fromDate ?? null,
+        }),
+      () => browserApi.accountsLiveMoneymoney(),
+    ),
+
+  mailLiveSearch: (subjectContains: string, limit?: number) =>
+    withFallback(
+      () =>
+        invoke("mail_live_search", {
+          subjectContains,
+          limit: limit ?? 20,
+        }),
+      () => browserApi.mailLiveSearch(subjectContains),
+    ),
+
+  keychainEnsureSlot: () =>
+    withFallback(
+      () => invoke<string>("keychain_ensure_slot"),
+      () => browserApi.keychainEnsureSlot(),
+    ),
+
+  reportsSnapshot: () =>
+    withFallback(
+      () => invoke("reports_snapshot"),
+      () => browserApi.reportsSnapshot(),
+    ),
+
+  archiveSnapshot: (query?: string) =>
+    withFallback(
+      () => invoke("archive_snapshot", { query: query ?? null }),
+      () => browserApi.archiveSnapshot(query),
+    ),
+
+  importPreviewBlob: (contentHash: string) =>
+    withFallback(
+      () => invoke<string>("import_preview_blob", { contentHash }),
+      () => browserApi.importPreviewBlob(contentHash),
+    ),
+
+  macosProbes: () =>
+    withFallback(
+      () => invoke("macos_capability_probes"),
+      () => browserApi.macosProbes(),
     ),
 };
 
